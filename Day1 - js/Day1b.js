@@ -1,0 +1,1 @@
+(a => {for(i of a) for(j of a) for(k of a) if (i+j+k == 2020) console.log(i, j, i+j+k, i*j*k)})(document.getElementsByTagName("pre")[0].innerText.split("\n").map(Number))
