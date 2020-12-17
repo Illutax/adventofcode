@@ -1,16 +1,14 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -25,12 +23,12 @@ public class Day8 {
         var machine = new Machine();
         day.applyUntilLoopOrEnd(machine, instructions);
         assert machine.ac == 1331 : "correct answer";
-        System.out.println("Current ac: "+ machine.ac + " current pc: " + machine.pc);
+        System.out.println("Current ac: " + machine.ac + " current pc: " + machine.pc);
 
         System.out.println("\nPart 2:");
         var lastSwappedInstruction = -1;
         var iter = -1;
-        while(machine.pc < instructions.size()) {
+        while (machine.pc < instructions.size()) {
             iter++;
             machine = new Machine();
             // Look for next possible instruction
@@ -50,16 +48,20 @@ public class Day8 {
         }
         assert machine.pc == instructions.size() : "Ran till the end";
         assert machine.ac == 1121 : "correct answer";
-        System.out.println("Correct instruction: " + lastSwappedInstruction + " current ac: "+ machine.ac + " current pc: " + machine.pc);
+        System.out.println("Correct instruction: " + lastSwappedInstruction + " current ac: " + machine.ac + " current pc: " + machine.pc);
     }
 
     private static void swapInstruction(List<Instruction> instructions, int i) {
-        instructions.get(i).opCode = instructions.get(i).opCode.equals("nop") ? "jmp" : "nop";
+        final var newOpCode = instructions.get(i).opCode.equals("nop")
+                ? "jmp"
+                : "nop";
+        final var instructionReplacement = Instruction.of(newOpCode, instructions.get(i).arg);
+        instructions.set(i, instructionReplacement);
     }
 
     public void applyUntilLoopOrEnd(Machine machine, List<Instruction> instructions) {
         machine.apply(instructions.get(0));
-        while(machine.pc < instructions.size()) {
+        while (machine.pc < instructions.size()) {
             if (machine.history.contains(machine.pc)) {
                 //System.out.println(":( Halted at pc=" + machine.pc);
                 break;
@@ -93,14 +95,17 @@ public class Day8 {
     }
 }
 
+@ToString
+@EqualsAndHashCode
 class Machine {
+    final Set<Integer> history = new TreeSet<>();
     int pc, ac;
-    Set<Integer> history = new TreeSet<>();
 
     @SuppressWarnings("unused") /*accessed via reflection*/
     public void nop(int i) {
         nop();
     }
+
     public void nop() {
         jmp(1);
     }
@@ -111,6 +116,7 @@ class Machine {
     }
 
     public void jmp(int i) {
+        if (pc + i < 0) throw new IllegalArgumentException("Underflow at pc:" + pc);
         history.add(pc);
         pc += i;
     }
@@ -118,59 +124,16 @@ class Machine {
     public void apply(Instruction in) {
         try {
             final Method op = Machine.class.getMethod(in.opCode, int.class);
-            var pcBefore = pc;
             op.invoke(this, in.arg);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public String toString() {
-        return "Machine{" +
-                "pc=" + pc +
-                ", ac=" + ac +
-                ", history=" + history +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Machine)) return false;
-        Machine machine = (Machine) o;
-        return pc == machine.pc &&
-                ac == machine.ac;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pc, ac);
-    }
 }
 
+@EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 class Instruction {
-    String opCode;
-    int arg;
-
-    public static Instruction of(String opCode, int arg) {
-        var instr = new Instruction();
-        instr.opCode = opCode;
-        instr.arg = arg;
-        return instr;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Instruction)) return false;
-        Instruction that = (Instruction) o;
-        return arg == that.arg &&
-                opCode.equals(that.opCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(opCode, arg);
-    }
+    final String opCode;
+    final int arg;
 }
