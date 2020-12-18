@@ -18,7 +18,7 @@ public class Day5
 
 	private static IntStream parseBinary()	{
 		try {
-			final String path = "Day2 -java/input5.txt";
+			final String path = "input5.txt";
 			return Files.lines(Paths.get(path))
 					.map(line -> line.replaceAll("B|R", "1"))
 					.map(line -> line.replaceAll("F|L", "0"))
