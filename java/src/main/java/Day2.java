@@ -12,7 +12,7 @@ public class Day2
 	public static void main(String[] args)
 	{
 		final Day2 day2 = new Day2();
-		input = new File("input.txt");
+		input = new File("input2.txt");
 		day2.q1();
 		day2.q2();
 	}
