@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @SuppressWarnings("unchecked")
 public class Day9 {
-    private static final String PATH = "java/input9.txt";
+    private static final String PATH = "input9.txt";
 
     public static void main(String[] args) throws IOException {
         var result = part1();
