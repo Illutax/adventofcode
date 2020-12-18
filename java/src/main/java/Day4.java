@@ -9,7 +9,7 @@ public class Day4
 {
 	public static void main(String[] args) throws IOException
 	{
-		File file = new File("Day2 -java/input4.txt");
+		File file = new File("input4.txt");
 		q2(file);
 	}
 
