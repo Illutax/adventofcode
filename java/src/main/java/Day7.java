@@ -66,7 +66,7 @@ public class Day7 {
 
     private static Map<String, Map<String, Integer>> parseRules() {
         Map<String, Map<String, Integer>> m = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(new File("java/input7.txt")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(new File("input7.txt")))) {
             for (String line; (line = br.readLine()) != null; ) {
                 parseAndPutRule(m, line);
             }
