@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class Day3 {
 
     public static void main(String[] args) throws IOException {
-        File file = new File("java/input3.txt");
+        File file = new File("input3.txt");
         int[][] grid = createGrid(file);
 
         assert 176 == q1(grid);
