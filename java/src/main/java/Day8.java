@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class Day8 {
     public static void main(String[] args) {
-        final String path = "java/input8.txt";
+        final String path = "input8.txt";
         final var day = new Day8();
         final List<Instruction> instructions = day.getInstructions(path);
 
