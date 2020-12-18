@@ -47,7 +47,7 @@ public class Day6 {
     }
 
     private static Scanner getScanner() {
-        final File file = new File("java/input6.txt");
+        final File file = new File("input6.txt");
         assert file.exists();
         try {
             final var scanner = new Scanner(file);
