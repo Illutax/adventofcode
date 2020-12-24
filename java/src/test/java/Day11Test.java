@@ -19,6 +19,17 @@ class Day11Test {
         assertThat(occ, is(37));
     }
 
+    @Test public void part2_TestInput() {
+        // Arrange
+        testGrid = AoCUtil.parseGrid(11_0, Day11.RULES);
+
+        // Act
+        final int occ = Day11.part2(testGrid);
+
+        // Assert
+        assertThat(occ, is(26));
+    }
+
     @Test public void doRound() {
         // Arrange
         int[][] afterOneRound = new int[][] {
@@ -109,7 +120,6 @@ class Day11Test {
         assertThat(occupiedNeighbouringSeats, is(3));
     }
 
-
     @Test
     public void countOccupiedNeighbouringSeats_8() {
         // Arrange
@@ -125,4 +135,50 @@ class Day11Test {
         // Assert
         assertThat(occupiedNeighbouringSeats, is(8));
     }
+
+    @Test
+    public void countOccupiedNeighbouringSeatsRec_2() {
+        // Arrange
+        int[][] grid = new int[][] {
+                        new int[] {2,2,2,2,2,2,2,1,2},
+                        new int[] {2,2,2,1,2,2,2,2,2},
+                        new int[] {2,1,2,2,2,2,2,2,2},
+                        new int[] {2,2,2,2,2,2,2,2,2},
+                        new int[] {2,2,1,0,2,2,2,2,1},
+                        new int[] {2,2,2,2,1,2,2,2,2},
+                        new int[] {2,2,2,2,2,2,2,2,2},
+                        new int[] {1,2,2,2,2,2,2,2,2},
+                        new int[] {2,2,2,1,2,2,2,2,2},
+        };
+
+        // Act
+        final int occupiedNeighbouringSeats = Day11.countOccupiedNeighbouringSeatsRec(0, 0, grid);
+
+        // Assert
+        assertThat(occupiedNeighbouringSeats, is(2));
+    }
+
+    @Test
+    public void countOccupiedNeighbouringSeatsRec() {
+        // Arrange
+        int[][] grid = new int[][] {
+                        new int[] {2,2,2,2,2,2,2,1,2},
+                        new int[] {2,2,2,1,2,2,2,2,2},
+                        new int[] {2,1,2,2,2,2,2,2,2},
+                        new int[] {2,2,2,2,2,2,2,2,2},
+                        new int[] {2,2,1,0,2,2,2,2,1},
+                        new int[] {2,2,2,2,1,2,2,2,2},
+                        new int[] {2,2,2,2,2,2,2,2,2},
+                        new int[] {1,2,2,2,2,2,2,2,2},
+                        new int[] {2,2,2,1,2,2,2,2,2},
+        };
+
+        // Act
+        final int occupiedNeighbouringSeats = Day11.countOccupiedNeighbouringSeatsRec(3, 4, grid);
+
+        // Assert
+        assertThat(occupiedNeighbouringSeats, is(8));
+    }
+
+
 }
