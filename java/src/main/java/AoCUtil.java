@@ -32,6 +32,14 @@ public class AoCUtil {
 
     @SneakyThrows
     @NotNull
+    public static List<String> parseInputToListStrings(
+                    int day) {
+        return Files.lines(Paths.get("input" + day + ".txt"))
+                        .collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    @NotNull
     public static int[][] parseGrid(int day,
                                                   Function<String, Integer> parseRules) {
         List<int[]> grid = new ArrayList<>();
