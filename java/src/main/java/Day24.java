@@ -43,7 +43,7 @@ enum Direction {
     }
 
     public static void main(String[] args) {
-        var lines = AoCUtil.parseInputToListStrings(24);
+        var lines = AoCUtil.parseInputToStringList(24);
         var result1 = part1(lines);
         log.info("Part 1 = {}", result1);
 

@@ -13,7 +13,7 @@ class Day24Test {
 
     @Test void part1() {
         // Arrange
-        var lines = AoCUtil.parseInputToListStrings(24);
+        var lines = AoCUtil.parseInputToStringList(24);
 
         // Act
         final long amountOfFlippedTiles = Day24.part1(lines);
@@ -24,7 +24,7 @@ class Day24Test {
 
     @Test void part1_sample() {
         // Arrange
-        var lines = AoCUtil.parseInputToListStrings(24_0);
+        var lines = AoCUtil.parseInputToStringList(24_0);
 
         // Act
         final long amountOfFlippedTiles = Day24.part1(lines);
@@ -35,7 +35,7 @@ class Day24Test {
 
     @Test void part2_sample() {
         // Arrange
-        var lines = AoCUtil.parseInputToListStrings(24_0);
+        var lines = AoCUtil.parseInputToStringList(24_0);
 
         // Act
         final long amountOfFlippedTiles = Day24.part2(lines);

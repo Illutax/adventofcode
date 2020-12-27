@@ -11,7 +11,7 @@ import java.util.Map;
     static Map<Integer, Long> dp;
 
     public static void main(String[] args) {
-        final var adapters = AoCUtil.parseInputToListOfInts(10);
+        final var adapters = AoCUtil.parseInputToIntList(10);
         int result1 = part1(adapters);
         assert result1 == 2176 : "Correct answer";
         log.info("Part1 solution={}", result1);

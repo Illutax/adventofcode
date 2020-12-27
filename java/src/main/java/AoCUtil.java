@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class AoCUtil {
     @SneakyThrows
     @NotNull
-    public static List<Long> parseInputToListOfLongs(
+    public static List<Long> parseInputToLongList(
                     int day) {
         return Files.lines(Paths.get("input" + day + ".txt"))
                         .map(Long::parseLong).collect(Collectors.toList());
@@ -24,7 +24,7 @@ public class AoCUtil {
 
     @SneakyThrows
     @NotNull
-    public static List<Integer> parseInputToListOfInts(
+    public static List<Integer> parseInputToIntList(
                     int day) {
         return Files.lines(Paths.get("input" + day + ".txt"))
                         .map(Integer::parseInt).collect(Collectors.toList());
@@ -32,7 +32,7 @@ public class AoCUtil {
 
     @SneakyThrows
     @NotNull
-    public static List<String> parseInputToListStrings(
+    public static List<String> parseInputToStringList(
                     int day) {
         return Files.lines(Paths.get("input" + day + ".txt"))
                         .collect(Collectors.toList());
