@@ -1,6 +1,7 @@
 package day02
 
 import readInput
+import util.Point2D
 
 typealias Input = List<Operator>
 typealias Output = Int
