@@ -50,7 +50,7 @@ if [[ $INPUT == *".."* ]]; then
     RANGE=(${INPUT//../ })
     START=${RANGE[0]}
     END=${RANGE[1]}
-    if [[ $START > $END ]]; then
+    if [[ $START -gt $END ]]; then
         echo "Invalid range $START to $END"
         exit 1
     else
