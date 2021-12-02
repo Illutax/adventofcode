@@ -11,9 +11,17 @@ if [[ $# -eq 0 ]]; then
     exit 1
 elif [[ $# -eq 2 ]]; then
     YEAR=$2
-else
+elif [[ $# -gt 2 ]]; then
     echo "Error: $# is too many arguments"
     help
+    exit 1
+# Check for existing
+elif [[ ! -f ".session" ]]; then
+    echo "No session file found. Add your session token into a file named 'session' and place it next to this script"
+    exit 1
+# Check session token format against RegEx
+elif [[ ! $(cat .session) =~ ^"session="[0-9a-f]+$ ]]; then
+    echo "Your session token seems wrong. It has to start with 'session='"
     exit 1
 fi
 
@@ -34,12 +42,25 @@ function download {
     echo "getting input for day $1..."
     curl -b $(cat .session) https://adventofcode.com/$YEAR/day/$1/input --silent > $FILEPATH
 
+    CONTENT=$(cat $FILEPATH)
     L=$(cat $FILEPATH | wc -l)
-    if [[ $L -eq 1 ]]; then
-        echo "ERROR:"
-        echo $(cat $FILEPATH)
+
+    if [[ $CONTENT == *"Please log in"* ]]; then
+        echo "ERROR: Your session cookie is invalid."
+        echo "Make sure
+    * you have a valid cookie in the format 'session=[0-9a-f]{97}' (without apostrophes) 
+    * in a file named '.session'
+    * at the next this script"
+        echo "(and don't forget to adust your .gitignore to ignore the cookie)"
         rm $FILEPATH
         exit 1
+    elif [[ $CONTENT == "Please don't repeatedly request this endpoint"* || $CONTENT == "404 Not Found" ]]; then
+        echo "ERROR: $(cat $FILEPATH)"
+        rm $FILEPATH
+        exit 1
+    elif [[ $L -eq 1 ]]; then
+        echo "Strange, just one line of input. Is that correct?"
+        echo $CONTENT
     fi
 
     echo "wrote input to $FILEPATH with $L lines"
