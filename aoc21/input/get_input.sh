@@ -1,5 +1,22 @@
 #!/bin/bash
 YEAR=2021
+
+function help {
+    echo "How to use: './get_input 3' or './get_input 1..25 2016' default year is $YEAR"
+}
+
+if [[ $# -eq 0 ]]; then
+    echo "Error: you need to pass at least an argument for the day"
+    help
+    exit 1
+elif [[ $# -eq 2 ]]; then
+    YEAR=$2
+else
+    echo "Error: $# is too many arguments"
+    help
+    exit 1
+fi
+
 INPUT=$1
 
 function download {
