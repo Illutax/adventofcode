@@ -12,7 +12,9 @@ fun readInputRaw(name: String) = File("src", "$name.txt").readLines()
 /**
  * Reads lines from the given input txt file
  */
-fun <T> readInput(name: String, block: (Sequence<String>) -> T) = Path("../input", "day$name.txt").useLines(block = block)
+fun <T> readInput(name: String, block: (Sequence<String>) -> T) = Path("../input", "day${format(name)}.txt").useLines(block = block)
+
+fun format(name: String): String = if (name.length == 1) "0" + name else name
 
 /**
  * Converts string to md5 hash.
