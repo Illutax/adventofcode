@@ -3,7 +3,7 @@ package day06
 import readInput
 
 typealias Input = List<Int>
-typealias Output = Int
+typealias Output = Long
 
 fun main() {
     val input = readInput("06", ::mapInput)
@@ -15,16 +15,24 @@ fun main() {
 
 fun mapInput(lines: Sequence<String>): Input = lines.flatMap { it.split(",").map(String::toInt) }.toList()
 
-fun part1(input: Input): Output = tickNTimes(input, 80).count()
+fun part1(input: Input): Output = tickNTimes(input, 80)
 
-fun tickNTimes(input: Input, times: Int): Input {
-    var newInput = input
+fun part2(input: Input): Output = tickNTimes(input, 256)
+
+fun tickNTimes(input: List<Int>, times: Int): Output {
+    var newInput = input.groupBy { it }.mapValues { it.value.count().toLong() }
     repeat(times) { tick(newInput).also { newInput = it } }
-    return newInput
+    return newInput.values.fold(0L) { a: Output, b: Output -> Math.addExact(a, b) }
 }
 
-fun tick(input: List<Int>): List<Int> = input.map { it - 1 }.flatMap { if (it < 0) listOf(6, 8) else listOf(it) }//.sortedWith(::is8)
-
-fun is8(o1: Int, o2: Int) = if (o1 == 8) 1 else if (o2 == 8) -1 else 0
-
-fun part2(input: Input): Long = TODO()
+fun tick(input: Map<Int, Output>): HashMap<Int, Output> {
+    val newMap = HashMap<Int, Output>()
+    for (k in input.keys) {
+        if (k == 0) {
+            newMap.merge(6, input[0]!!) { _, v -> v + (input[0]!!) }
+            newMap[8] = input[0]!!
+        } else
+            newMap[k - 1] = newMap.getOrDefault(k - 1, 0) + input[k]!!
+    }
+    return newMap
+}

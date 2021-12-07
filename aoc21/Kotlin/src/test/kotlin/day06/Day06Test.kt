@@ -16,19 +16,24 @@ class Day06Test {
 
     @Test
     fun `tick once`() {
-        assertEquals(listOf(2, 3, 2, 0, 1), tick(listOf(3, 4, 3, 1, 2)))
+        assertEquals(mapOf(Pair(0,1L), Pair(1,1), Pair(2,2), Pair(3,1)), tick(mapOf(Pair(1,1), Pair(2,1), Pair(3,2), Pair(4,1))))
+    }
+
+    @Test
+    fun `tick once with collision`() {
+        assertEquals(mapOf(Pair(6,3L), Pair(8,1)), tick(mapOf(Pair(0,1), Pair(7,2))))
     }
 
     @Test
     fun `tick 18 times`() {
         val input = readInput(path, ::mapInput);
-        assertEquals(26, tickNTimes(input, 18).count())
+        assertEquals(26, tickNTimes(input, 18))
     }
 
     @Test
     fun `amount of fish after 18 nticks`() {
         val input = readInput(path, ::mapInput);
-        assertEquals(26, tickNTimes(input, 18).count())
+        assertEquals(26, tickNTimes(input, 18))
     }
 
     @Test
