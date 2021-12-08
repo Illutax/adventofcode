@@ -21,7 +21,4 @@ fun format(name: String): String = if (name.length == 1) "0" + name else name
  */
 fun String.md5(): String = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray())).toString(16)
 
-fun List<Int>.getMinMax(): Pair<Int, Int> {
-    val sorted = this.sorted()
-    return Pair(sorted.first(), sorted.last())
-}
+fun <T : Comparable<T>> Iterable<T>.getMinMax(): Pair<T, T> = Pair(minOrNull()!!, maxOrNull()!!)
