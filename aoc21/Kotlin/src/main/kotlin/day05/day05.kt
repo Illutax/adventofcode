@@ -1,6 +1,6 @@
 package day05
 
-import readInput
+import util.readInput
 import kotlin.math.abs
 
 typealias Input = List<Interval>

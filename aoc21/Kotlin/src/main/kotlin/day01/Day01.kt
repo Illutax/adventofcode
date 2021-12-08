@@ -1,6 +1,6 @@
 package day01
 
-import readInput
+import util.readInput
 
 typealias Input = List<Int>
 typealias Output = Int

@@ -1,6 +1,6 @@
 package day04
 
-import readInput
+import util.readInput
 
 typealias Input = BingoGame
 typealias Output = Int

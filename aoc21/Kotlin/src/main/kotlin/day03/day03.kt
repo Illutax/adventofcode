@@ -1,6 +1,6 @@
 package day03
 
-import readInput
+import util.readInput
 import kotlin.math.pow
 import kotlin.streams.toList
 

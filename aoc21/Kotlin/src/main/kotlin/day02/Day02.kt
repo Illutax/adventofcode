@@ -1,6 +1,6 @@
 package day02
 
-import readInput
+import util.readInput
 import model.Point
 
 typealias Input = List<Operator>

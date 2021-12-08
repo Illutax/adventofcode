@@ -1,7 +1,7 @@
 package day08
 
 import org.junit.jupiter.api.Test
-import readInput
+import util.readInput
 import kotlin.test.assertEquals
 
 class Day08Test {

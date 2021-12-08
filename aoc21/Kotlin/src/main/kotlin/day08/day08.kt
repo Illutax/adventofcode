@@ -1,6 +1,6 @@
 package day08
 
-import readInput
+import util.readInput
 
 typealias Input = List<Pair<List<String>, List<String>>>
 typealias Output = Int
