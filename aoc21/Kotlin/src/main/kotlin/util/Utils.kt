@@ -30,3 +30,5 @@ fun format(name: String): String = if (name.length == 1) "0$name" else name
 fun String.md5(): String = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray())).toString(16)
 
 fun <T : Comparable<T>> Iterable<T>.minMax(): Pair<T, T> = Pair(minOrNull()!!, maxOrNull()!!)
+
+fun <T> Iterable<T>.median(): T = this.elementAt(this.count()/2)
