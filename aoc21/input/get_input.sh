@@ -64,6 +64,7 @@ function download {
     fi
 
     echo "wrote input to $FILEPATH with $L lines"
+    cat $FILEPATH
 }
 
 # download a range of inputs
