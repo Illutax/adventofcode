@@ -48,9 +48,9 @@ function download {
     if [[ $CONTENT == *"Please log in"* ]]; then
         echo "ERROR: Your session cookie is invalid."
         echo "Make sure
-    * you have a valid cookie in the format 'session=[0-9a-f]{97}' (without apostrophes) 
+    * you have a valid cookie in the format 'session=[0-9a-f]{128}' (without apostrophes)
     * in a file named '.session'
-    * at the next this script"
+    * next to this script"
         echo "(and don't forget to adust your .gitignore to ignore the cookie)"
         rm $FILEPATH
         exit 1
