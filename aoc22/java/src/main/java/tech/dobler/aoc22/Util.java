@@ -51,5 +51,8 @@ public class Util {
     public static void printf(String str, Object... args) {
         System.out.printf(str, args); // NOSONAR
     }
+    public static void printfln(String str, Object... args) {
+        System.out.printf(str+"\n", args); // NOSONAR
+    }
 
 }
