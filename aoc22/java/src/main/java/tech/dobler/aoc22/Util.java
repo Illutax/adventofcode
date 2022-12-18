@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class Util {
@@ -13,6 +14,10 @@ public class Util {
 
     public static Stream<String> splitByNewLine(String input) {
         return Stream.of(input.split("\n"));
+    }
+
+    public static <T> Stream<T> splitByNewLine(String testInput, Function<String, T> transformer) {
+        return splitByNewLine(testInput).map(transformer);
     }
 
     public static String readInput(int day) {
@@ -46,4 +51,5 @@ public class Util {
     public static void printf(String str, Object... args) {
         System.out.printf(str, args); // NOSONAR
     }
+
 }
