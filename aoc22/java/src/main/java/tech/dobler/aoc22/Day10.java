@@ -25,45 +25,57 @@ public class Day10 {
     record Noop() implements Instruction {
     }
 
-    // TODO: Pull out two concrete machines
-    static class Machine {
-        private final int firstCycleOffSet;
-        private int cycles = 0;
-        private final List<Long> xs = new ArrayList<>();
+    static class SimpleMachine extends Machine {
         private final List<Long> signals = new ArrayList<>();
-        private final int cycleLength;
+
+        public SimpleMachine() {
+            super(20, 40);
+        }
+
+        private long currentSignal() {
+            return cycles * aggregate(xs);
+        }
+
+        @Override
+        protected void flush() {
+            final var currentX = aggregate(xs);
+            signals.add(currentSignal());
+            xs.clear();
+            xs.add(currentX);
+        }
+
+        @Override
+        public SimpleMachine accept(Stream<Instruction> instructions) {
+            return (SimpleMachine) super.accept(instructions);
+        }
+
+        public long getSignalStrength() {
+            return aggregate(signals);
+        }
+    }
+
+    static class CRTMachine extends Machine {
         private StringBuilder crtBuffer;
         private final StringBuilder crt = new StringBuilder(6);
 
-        public Machine(int firstCycleOffSet, int cycleLength) {
-            xs.add(1L); // initial value
-            this.firstCycleOffSet = firstCycleOffSet;
-            this.cycleLength = cycleLength;
+        public CRTMachine() {
+            super(0, 40);
             crtBuffer = new StringBuilder(cycleLength);
         }
 
-        public void accept(Instruction instruction) {
-            cycle();
-            if (instruction instanceof AddX addX) {
-                cycle();
-                append(addX.amount);
-            }
+        @Override
+        protected void flush() {
+            crt.append(flushBuffer()).append("\n");
         }
 
-        private void append(long amount) {
-            xs.add(amount);
+        public String flushBuffer() {
+            final var content = crtBuffer.toString();
+            crtBuffer = new StringBuilder(cycleLength);
+            return content;
         }
 
-        private void cycle() {
-            drawToCRTBuffer();
-
-            cycles++;
-
-            if ((cycles - firstCycleOffSet) % cycleLength == 0)
-                crt.append(flushBuffer()).append("\n");
-            if (cycles == firstCycleOffSet || (cycles - firstCycleOffSet) % cycleLength == 0) {
-                flush();
-            }
+        public String writeCRT() {
+            return crt.toString();
         }
 
         private void drawToCRTBuffer() {
@@ -83,50 +95,76 @@ public class Day10 {
             return currentCycle - 1 <= signal && signal <= currentCycle + 1;
         }
 
-        private void flush() {
-            final var currentX = aggregate(xs);
-            final var signal = currentSignal();
-            signals.add(signal);
-            xs.clear();
-            xs.add(currentX);
+        @Override
+        public CRTMachine accept(Stream<Instruction> instructions) {
+            return (CRTMachine) super.accept(instructions);
         }
 
-        private long currentSignal() {
-            return cycles * aggregate(xs);
-        }
-
-        private long aggregate(List<Long> list) {
-            return list.stream().mapToLong(i -> i).sum();
-        }
-
-        public long getSignalStrength() {
-            return aggregate(signals);
-        }
-
-        public String flushBuffer() {
-            final var content = crtBuffer.toString();
-            crtBuffer = new StringBuilder(cycleLength);
-            return content;
-        }
-
-        public String writeCRT() {
-            return crt.toString();
-        }
-
-        public Machine accept(Stream<Instruction> instructions) {
-            instructions.forEach(this::accept);
-            return this;
+        @Override
+        protected void preCycle() {
+            drawToCRTBuffer();
         }
     }
 
+    abstract static class Machine {
+        private final int firstCycleOffSet;
+
+        protected int cycles = 0;
+        protected final List<Long> xs = new ArrayList<>();
+        protected final int cycleLength;
+
+        protected Machine(int firstCycleOffSet, int cycleLength) {
+            xs.add(1L); // initial value
+            this.firstCycleOffSet = firstCycleOffSet;
+            this.cycleLength = cycleLength;
+        }
+
+        public void accept(Instruction instruction) {
+            cycle();
+            if (instruction instanceof AddX addX) {
+                cycle();
+                append(addX.amount);
+            }
+        }
+
+        private void append(long amount) {
+            xs.add(amount);
+        }
+
+        private void cycle() {
+            preCycle();
+
+            cycles++;
+
+            if (cycles != 0 && cycles == firstCycleOffSet
+                    || (cycles - firstCycleOffSet) % cycleLength == 0) {
+                flush();
+            }
+        }
+
+        protected void preCycle() {
+        }
+
+        protected static long aggregate(List<Long> list) {
+            return list.stream().mapToLong(i -> i).sum();
+        }
+
+        protected Machine accept(Stream<Instruction> instructions) {
+            instructions.forEach(this::accept);
+            return this;
+        }
+
+        protected abstract void flush();
+    }
+
     public long part1(Stream<Instruction> input) {
-        return new Machine(20, 40)
+        return new SimpleMachine()
                 .accept(input)
                 .getSignalStrength();
     }
 
     public String part2(Stream<Instruction> input) {
-        return new Machine(0, 40)
+        return new CRTMachine()
                 .accept(input)
                 .writeCRT();
     }
