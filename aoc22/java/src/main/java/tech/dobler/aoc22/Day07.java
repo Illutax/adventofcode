@@ -12,6 +12,7 @@ public class Day07 {
 
     // formatter: off
     sealed interface Node permits DirectoryNode, FileNode {
+        String name();
     }
 
     record DirectoryNode(String name, Map<String, Node> children) implements Node {
@@ -195,7 +196,7 @@ public class Day07 {
     }
 
     // have to be its own method https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8298566
-    // otherwise one inner return value should be cast explicit, to Line, not the outer switch expression,
+    // otherwise one inner return internal should be cast explicit, to Line, not the outer switch expression,
     // or otherwise it crashes while compiling
     private static Line translateLine(String line) {
         final var args = line.split(" ");
@@ -218,11 +219,10 @@ public class Day07 {
             var line = input.get(index);
             switch (line) {
                 case ListDir ignored -> {
-                    while ((line = ++index < input.size() ? input.get(index) : null) instanceof Output) {
-                        switch (line) {
+                    while ((++index < input.size() ? input.get(index) : null) instanceof Output out) {
+                        switch (out) { // NOSONAR
                             case DirectoryOutput dir -> parent.addChildDirectory(dir, parent);
                             case FileOutput file -> parent.addChildFile(file, parent);
-                            default -> throw new IllegalStateException("Unexpected value: " + line);
                         }
                     }
                 }
@@ -230,7 +230,7 @@ public class Day07 {
                     var node = parent.getChildrenOfName(cd.destination);
                     index = parseTree(input, ++index, (DirectoryNode) node);
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + line);
+                default -> throw new IllegalStateException("Unexpected internal: " + line);
             }
         }
         return index;
