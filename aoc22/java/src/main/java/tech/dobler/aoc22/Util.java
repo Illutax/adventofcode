@@ -1,11 +1,15 @@
 package tech.dobler.aoc22;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 public class Util {
@@ -16,8 +20,21 @@ public class Util {
         return Stream.of(input.split("\n"));
     }
 
+    public static Stream<String> splitBy(String regex, String input) {
+        return Stream.of(input.split(regex));
+    }
+
     public static <T> Stream<T> splitByNewLine(String testInput, Function<String, T> transformer) {
-        return splitByNewLine(testInput).map(transformer);
+        return splitBy("\n", testInput).map(transformer);
+    }
+
+    public static <T> Stream<T> splitByDoubleNewLine(String testInput, Function<String, T> transformer) {
+        return splitBy("\n\n", testInput).map(transformer);
+    }
+
+    @SuppressWarnings("unused")
+    public static <T> Stream<T> splitBy(String regex, String testInput, Function<String, T> transformer) {
+        return splitBy(regex, testInput).map(transformer);
     }
 
     public static String readInput(int day) {
@@ -54,5 +71,24 @@ public class Util {
     public static void printfln(String str, Object... args) {
         System.out.printf(str+"\n", args); // NOSONAR
     }
+    public static void requirePatternMatches(String input, Matcher result) {
+        if (!result.matches()) throw new PatternDoesNotMatchException("Does not match pattern \"%s\" for regex: \"%s\"".formatted(input, result.pattern().pattern()));
+    }
 
+    static class PatternDoesNotMatchException extends IllegalArgumentException {
+        public PatternDoesNotMatchException(String input) {
+            super("Does not match pattern \"%s\"".formatted(input));
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Math {
+
+        public static int multiply(int a, int b) {
+            return a * b;
+        }
+        public static long multiply(long a, long b) {
+            return a * b;
+        }
+    }
 }
