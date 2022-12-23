@@ -30,46 +30,72 @@ class Day12Test {
 
     @Nested
     class CanConnect {
-        @Test
-        void startWithA()
-        {
-            assertThat(canConnect('S','a')).isTrue();
+
+        @Nested
+        class Reversed {
+            @Test
+            void endToZ() {
+                assertThat(Day12.canConnectReverse('E', 'z')).isTrue();
+            }
+
+            @Test
+            void endToY() {
+                assertThat(Day12.canConnectReverse('E', 'y')).isTrue();
+            }
+
+            @Test
+            void endToX() {
+                assertThat(Day12.canConnectReverse('E', 'x')).isFalse();
+            }
+
+            @Test
+            void endToW() {
+                assertThat(Day12.canConnectReverse('E', 'w')).isFalse();
+            }
+
+            @Test
+            void zToX() {
+                assertThat(Day12.canConnectReverse('z', 'x')).isFalse();
+            }
         }
 
-        @Test
-        void aWithStart()
-        {
-            assertThat(canConnect('a','S')).isTrue();
-        }
+        @Nested
+        class Forward {
 
-        @Test
-        void startWithB()
-        {
-            assertThat(canConnect('S','b')).isTrue();
-        }
+            @Test
+            void startWithA() {
+                assertThat(canConnect('S', 'a')).isTrue();
+            }
 
-        @Test
-        void startWithC()
-        {
-            assertThat(canConnect('S','c')).isFalse();
-        }
+            @Test
+            void aWithStart() {
+                assertThat(canConnect('a', 'S')).isTrue();
+            }
 
-        @Test
-        void xWithEnd()
-        {
-            assertThat(canConnect('x','E')).isFalse();
-        }
+            @Test
+            void startWithB() {
+                assertThat(canConnect('S', 'b')).isTrue();
+            }
 
-        @Test
-        void yWithEnd()
-        {
-            assertThat(canConnect('y','E')).isTrue();
-        }
+            @Test
+            void startWithC() {
+                assertThat(canConnect('S', 'c')).isFalse();
+            }
 
-        @Test
-        void zWithEnd()
-        {
-            assertThat(canConnect('z','E')).isTrue();
+            @Test
+            void xWithEnd() {
+                assertThat(canConnect('x', 'E')).isFalse();
+            }
+
+            @Test
+            void yWithEnd() {
+                assertThat(canConnect('y', 'E')).isTrue();
+            }
+
+            @Test
+            void zWithEnd() {
+                assertThat(canConnect('z', 'E')).isTrue();
+            }
         }
     }
 
@@ -84,6 +110,6 @@ class Day12Test {
     void part2() {
         assertThat(day.part2(transform(testInput))).isEqualTo(29);
 
-        assertThat(day.part2(readInput())).isEqualTo(-1);
+        assertThat(day.part2(readInput())).isEqualTo(451);
     }
 }

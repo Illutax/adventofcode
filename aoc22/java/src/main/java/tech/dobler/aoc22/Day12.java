@@ -1,6 +1,7 @@
 package tech.dobler.aoc22;
 
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -100,20 +101,20 @@ public class Day12 {
             for (int j = 0; j < chars.length; j++) { // X
                 char c = chars[j];
                 Node n = new Node();
-                if (c == 'S') {
+                if (c == 'E') {
                     startNode = n;
                 }
                 if (i > 0) {
                     final var aboveC = lines[i - 1].charAt(j);
                     final var aboveNeighbour = allNodes.get(getKey(j, i - 1));
-                    if (canConnect(aboveC, c)) aboveNeighbour.neighbours.add(n);
-                    if (canConnect(c, aboveC)) n.neighbours.add(aboveNeighbour);
+                    if (canConnectReverse(aboveC, c)) aboveNeighbour.neighbours.add(n);
+                    if (canConnectReverse(c, aboveC)) n.neighbours.add(aboveNeighbour);
                 }
                 if (j > 0) {
                     final var leftC = line.charAt(j - 1);
                     final var leftNeighbour = allNodes.get(getKey(j - 1, i));
-                    if (canConnect(leftC, c)) leftNeighbour.neighbours.add(n);
-                    if (canConnect(c, leftC)) n.neighbours.add(leftNeighbour);
+                    if (canConnectReverse(leftC, c)) leftNeighbour.neighbours.add(n);
+                    if (canConnectReverse(c, leftC)) n.neighbours.add(leftNeighbour);
                 }
                 final var key = getKey(j, i);
                 n.setCoord(key);
@@ -139,28 +140,51 @@ public class Day12 {
     }
 
     public static boolean canConnect(char from, char to) {
-        final char i = (char) (re(from) + 1);
-        final char j = re(to);
-        return i >= j;
+        return (char) (re(from) + 1) >= re(to);
+    }
+
+    public static boolean canConnectReverse(char from, char to) {
+        return canConnect(to, from);
     }
 
     class Dijkstra {
         private Queue<Node> discovered = new ArrayDeque<>();
         private Set<Node> processed = new HashSet<>();
-        private Node end;
 
-        public Dijkstra(Node start) {
-            start.setCost(0);
-            processed.add(start);
-            discoverAll(start);
-            while(discovered.peek() != null) {
+        public Dijkstra(Node end) {
+            end.setCost(0);
+            processed.add(end);
+            discoverAll(end);
+        }
+
+        public Node part1()
+        {
+            Node start = null;
+            while (discovered.peek() != null) {
                 final var current = discovered.poll();
                 discoverAll(current);
-                if (current.getValue() == 'E') {
-                    end = current;
+                if (current.getValue() == 'S') {
+                    start = current;
                     break;
                 }
             }
+            return start;
+        }
+
+        public Node part2()
+        {
+            List<Node> starts = new LinkedList<>();
+            while (discovered.peek() != null) {
+                final var current = discovered.poll();
+                discoverAll(current);
+                if (current.getValue() == 'S' || current.getValue() == 'a') {
+                    starts.add(current);
+                }
+            }
+            return starts.stream()
+                    .sorted(Comparator.comparing(Node::getCost))
+                    .findFirst()
+                    .orElseThrow();
         }
 
         private void discoverAll(Node current) {
@@ -177,18 +201,15 @@ public class Day12 {
             }
             processed.add(current);
         }
-
-        public Node getEnd() {
-            return end;
-        }
     }
 
     public int part1(Node startNode) {
         final var dijkstra = new Dijkstra(startNode);
-        return dijkstra.getEnd().getCost();
+        return dijkstra.part1().getCost();
     }
 
-    public int part2(Node input) {
-        return -1;
+    public int part2(Node startNode) {
+        final var dijkstra = new Dijkstra(startNode);
+        return dijkstra.part2().getCost();
     }
 }
