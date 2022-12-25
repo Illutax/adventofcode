@@ -1,14 +1,19 @@
 package tech.dobler.aoc22;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class Day12 {
     static final class Node {
@@ -24,15 +29,11 @@ public class Day12 {
         }
 
         Node() {
-            this((Node) null);
+            this(null);
         }
 
         Node(Node parent) {
             this(parent, new LinkedList<>());
-        }
-
-        Node(List<Node> neighbours) {
-            this(null, neighbours);
         }
 
         public Node parent() {
@@ -78,6 +79,10 @@ public class Day12 {
             coord = key;
         }
 
+        public String getCoord() {
+            return coord;
+        }
+
         public char getValue() {
             return value;
         }
@@ -91,7 +96,7 @@ public class Day12 {
         }
     }
 
-    static Node transform(String input) {
+    static Node transform(String input) { // NOSONAR (it's alright)
         Node startNode = null;
         final var allNodes = HashMap.<String, Node>newHashMap(input.length());
         final var lines = input.split("\n");
@@ -144,12 +149,13 @@ public class Day12 {
     }
 
     public static boolean canConnectReverse(char from, char to) {
-        return canConnect(to, from);
+        return canConnect(to, from); // NOSONAR that is intended... duh!
     }
 
-    class Dijkstra {
-        private Queue<Node> discovered = new ArrayDeque<>();
-        private Set<Node> processed = new HashSet<>();
+    static class Dijkstra {
+        private final Queue<Node> discovered = new ArrayDeque<>();
+        private final Set<Node> processed = new HashSet<>();
+        private Node start;
 
         public Dijkstra(Node end) {
             end.setCost(0);
@@ -157,22 +163,19 @@ public class Day12 {
             discoverAll(end);
         }
 
-        public Node part1()
-        {
-            Node start = null;
+        public Dijkstra part1() {
             while (discovered.peek() != null) {
                 final var current = discovered.poll();
                 discoverAll(current);
                 if (current.getValue() == 'S') {
-                    start = current;
+                    this.start = current;
                     break;
                 }
             }
-            return start;
+            return this;
         }
 
-        public Node part2()
-        {
+        public Dijkstra part2() {
             List<Node> starts = new LinkedList<>();
             while (discovered.peek() != null) {
                 final var current = discovered.poll();
@@ -181,35 +184,93 @@ public class Day12 {
                     starts.add(current);
                 }
             }
-            return starts.stream()
-                    .sorted(Comparator.comparing(Node::getCost))
-                    .findFirst()
+            start = starts.stream()
+                    .min(Comparator.comparing(Node::getCost))
                     .orElseThrow();
+            return this;
         }
 
         private void discoverAll(Node current) {
-            current.neighbours.forEach(n -> {
+            current.neighbours().forEach(n -> {
                 final var newCost = current.getCost() + 1;
                 if (newCost < n.getCost()) {
                     n.setParent(current);
                     n.setCost(newCost);
                 }
             });
-            for (Node neighbour : current.neighbours) {
+            for (Node neighbour : current.neighbours()) {
                 if (!processed.contains(neighbour) && !discovered.contains(neighbour))
                     discovered.add(neighbour);
             }
             processed.add(current);
         }
+
+        public Dijkstra draw(Consumer<String> printer) {
+            Map<String, Character> grid = new HashMap<>();
+            for (var node = start; node.parent() != null; node = node.parent()) {
+                grid.put(node.getCoord(), getDisplayDirection(node));
+                for (Node neighbour : node.neighbours()) {
+                    grid.put(neighbour.getCoord(), getDisplayDirection(neighbour));
+                }
+            }
+
+            final var maxDims = new ArrayList<>(List.of(0, 0));
+            grid.keySet().stream()
+                    .map(s -> Arrays.stream(s.split(":")).map(Integer::parseInt).toList())
+                    .forEach(e -> {
+                        if (e.get(0) > maxDims.get(0)) maxDims.set(0, e.get(0));
+                        if (e.get(1) > maxDims.get(1)) maxDims.set(1, e.get(1));
+                    });
+
+            var sb = new StringBuilder();
+            for (int y = 0; y <= maxDims.get(1); y++) {
+                for (int x = 0; x <= maxDims.get(0); x++) {
+                    final var key = x + ":" + y;
+                    if (grid.containsKey(key))
+                        sb.append(grid.get(key));
+                    else
+                        sb.append('.');
+                }
+                sb.append("\n");
+            }
+            printer.accept(sb.toString());
+            return this;
+        }
+
+        private Character getDisplayDirection(Node node) {
+            final var coord = node.getCoord();
+            final var maybeParent = Optional.ofNullable(node.parent)
+                    .map(Node::getCoord);
+            if (maybeParent.isEmpty()) return 'E';
+            final var parent = maybeParent.get();
+            final var coords = coord.split(":");
+            final var x = Integer.parseInt(coords[0]);
+            final var y = Integer.parseInt(coords[1]);
+            final var parentCoords = parent.split(":");
+            final var dx = Integer.parseInt(parentCoords[0]);
+            final var dy = Integer.parseInt(parentCoords[1]);
+            if (y < dy) return 'v';
+            if (y > dy) return '^';
+            if (x < dx) return '>';
+            return '<';
+        }
+
+        public int getLength() {
+            return start.getCost();
+        }
     }
 
     public int part1(Node startNode) {
-        final var dijkstra = new Dijkstra(startNode);
-        return dijkstra.part1().getCost();
+        return new Dijkstra(startNode)
+                .part1()
+                .draw(Util::print)
+                .getLength();
     }
 
     public int part2(Node startNode) {
-        final var dijkstra = new Dijkstra(startNode);
-        return dijkstra.part2().getCost();
+        return new Dijkstra(startNode)
+                .part2()
+                .draw(Util::print)
+                .getLength();
     }
 }
