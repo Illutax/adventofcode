@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Util {
@@ -73,6 +75,16 @@ public class Util {
     }
     public static void requirePatternMatches(String input, Matcher result) {
         if (!result.matches()) throw new PatternDoesNotMatchException("Does not match pattern \"%s\" for regex: \"%s\"".formatted(input, result.pattern().pattern()));
+    }
+
+    public static <T> Stream<List<T>> chunked(List<T> list, int size) {
+        return chunked(list.stream(), size);
+    }
+
+    public static <T> Stream<List<T>> chunked(Stream<T> stream, int size) {
+        final var counter = new AtomicInteger();
+        return stream.collect(Collectors.groupingBy(x -> counter.getAndIncrement() / size))
+                .values().stream();
     }
 
     static class PatternDoesNotMatchException extends IllegalArgumentException {
