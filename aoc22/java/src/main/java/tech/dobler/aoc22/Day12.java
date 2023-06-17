@@ -135,7 +135,7 @@ public class Day12 {
         return x + ":" + y;
     }
 
-    public static char re(char a) {
+    public static char coalesceEnds(char a) {
         final var c = a == 'E'
                 ? 'z'
                 : a;
@@ -145,7 +145,7 @@ public class Day12 {
     }
 
     public static boolean canConnect(char from, char to) {
-        return (char) (re(from) + 1) >= re(to);
+        return (char) (coalesceEnds(from) + 1) >= coalesceEnds(to);
     }
 
     public static boolean canConnectReverse(char from, char to) {
