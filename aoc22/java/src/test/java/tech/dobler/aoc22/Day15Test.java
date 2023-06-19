@@ -1,7 +1,6 @@
 package tech.dobler.aoc22;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import tech.dobler.aoc22.Day15.Beacon;
@@ -12,6 +11,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.dobler.aoc22.Day15.parseInput;
+import static tech.dobler.aoc22.Util.print;
 
 class Day15Test {
 
@@ -50,23 +50,26 @@ class Day15Test {
 
             assertThat(sensor).isEqualTo(
                     new Sensor(
-                            Coordinate.from(2,18), new
-                            Beacon(Coordinate.from(-2,15))));
+                            Coordinate.from(2, 18), new
+                            Beacon(Coordinate.from(-2, 15))));
         }
     }
 
-
     @Test
     void part1() {
-        assertThat(day.part1(parseInput(Util.splitByNewLine(testInput)))).isEqualTo(26);
+        print("################################# Test input ####################################");
+        assertThat(day.part1(parseInput(Util.splitByNewLine(testInput)), 10)).isEqualTo(26);
 
-        assertThat(day.part1(parseInput(readInput()))).isEqualTo(-1);
+        print("################################# Actual input ####################################");
+        assertThat(day.part1(parseInput(readInput()), 2000000))
+                .isLessThan(5_024_155)
+                .isLessThan(4_811_306)
+                .isEqualTo(4_724_228);
     }
 
-    @Disabled
     @Test
     void part2() {
-        assertThat(day.part2(parseInput(Util.splitByNewLine(testInput)))).isEqualTo(-1);
+        assertThat(day.part2(parseInput(Util.splitByNewLine(testInput)))).isEqualTo(56000011);
 
         assertThat(day.part2(parseInput(readInput()))).isEqualTo(-1);
     }

@@ -13,13 +13,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static tech.dobler.aoc22.Util.print;
-import static tech.dobler.aoc22.Util.printfln;
 
 
 public class Day15 {
     public record Coordinate(int x, int y) implements ICoordinate, Comparable<Coordinate> {
         public static final Pattern PATTERN = Pattern.compile("x=-?\\d+, y=-?\\d+");
-        public static final Coordinate DIAGONALLY_TO_THE_RIGHT = Coordinate.from(1, -1);
 
         public static Coordinate from(int x, int y) {
             return new Coordinate(x, y);
@@ -35,8 +33,7 @@ public class Day15 {
         }
 
         public int distance(Coordinate other) {
-            return Math.max(x, other.x) - Math.min(x, other.x)
-                    + Math.max(y, other.y) - Math.min(y, other.y);
+            return Math.abs(x - other.x) + Math.abs(y - other.y);
         }
 
         @Override
@@ -86,8 +83,15 @@ public class Day15 {
     }
 
     public record Grid(Map<Coordinate, Cell> map, AtomicReference<Boundaries> boundaries) {
+        public static int ROW_OF_INTEREST = 2_000_000;
+
         public static Grid empty() {
             return new Grid(new HashMap<>(), new AtomicReference<>(Day14.Boundaries.empty()));
+        }
+
+        public Grid withRowOfInterest(int rowOfInterest) {
+            Grid.ROW_OF_INTEREST = rowOfInterest; // NOSONAR
+            return this;
         }
 
         public void withSensor(Sensor sensor) {
@@ -97,36 +101,41 @@ public class Day15 {
         }
 
         private void placeMarkers(Sensor sensor) {
-            final var dist = sensor.position.distance(sensor.beacon.position);
-            printfln("Filling sensor with distance: %d, area: %d", dist, dist*dist*2L);
-            var currentPosition = sensor.position;
-            // go to x-dist
-            currentPosition = currentPosition.add(Coordinate.from(-dist - 1, 1));
-            for (int col = 0; col < dist; col++) {
-                // add (1,1) dist times
-                for (int row = 0; row <= dist; row++) {
-                    currentPosition = currentPosition.add(Coordinate.DIAGONALLY_TO_THE_RIGHT);
-                    tryPlaceMarker(currentPosition);
-                }
-                // go (-dist-1,-dist-2) and repeat dist times
-                currentPosition = currentPosition.add(Coordinate.from(-dist, dist + 1));
-
-                for (int row = 0; row < dist; row++) {
-                    currentPosition = currentPosition.add(Coordinate.DIAGONALLY_TO_THE_RIGHT);
-                    tryPlaceMarker(currentPosition);
-                }
-                currentPosition = currentPosition.add(Coordinate.from(-dist, dist + 1));
+            var currentPosition = sensor.position();
+            final var dist = currentPosition.distance(sensor.beacon().position());
+            if (currentPosition.y() - dist - 1 > ROW_OF_INTEREST
+                    || currentPosition.y() + dist + 1 < ROW_OF_INTEREST) {
+                return;
             }
-            for (int row = 0; row <= dist; row++) {
-                currentPosition = currentPosition.add(Coordinate.DIAGONALLY_TO_THE_RIGHT);
-                tryPlaceMarker(currentPosition);
+
+            var startingBoundry = Math.max(0, dist - currentPosition.y());
+            for (int dy = startingBoundry; dy < dist + 1; dy++) {
+
+                // Draw upper pyramid
+                if (currentPosition.y() - dy == ROW_OF_INTEREST) {
+                    for (int dx = 2 * dy - dist; dx < dist + 1; dx++) {
+                        tryPlaceMarker(currentPosition.add(Coordinate.from(dx - dy, -dy)));
+                    }
+                    break;
+                }
+            }
+            startingBoundry = Math.max(1, dist - currentPosition.y());
+            for (int dy = startingBoundry; dy < dist + 1; dy++) {
+                // Draw lower pyramid
+                if (currentPosition.y() + dy == ROW_OF_INTEREST) {
+                    for (int dx = 2 * dy - dist; dx < dist + 1; dx++) {
+                        tryPlaceMarker(currentPosition.add(Coordinate.from(dx - dy, dy)));
+                    }
+                    break;
+                }
             }
         }
 
         private void tryPlaceMarker(Coordinate position) {
             //noinspection SwitchStatementWithTooFewBranches
             switch (map.getOrDefault(position, Cell.EMPTY)) { //NOSONAR
-                case EMPTY -> putInternally(position, Cell.MARKED);
+                case EMPTY //
+                        -> putInternally(position, Cell.MARKED);
             }
         }
 
@@ -148,7 +157,6 @@ public class Day15 {
             }
             return sb.toString();
         }
-
     }
 
     public static Stream<Sensor> parseInput(Stream<String> input) {
@@ -156,13 +164,14 @@ public class Day15 {
     }
 
 
-    public int part1(Stream<Sensor> sensors) {
-        final var grid = Grid.empty();
+    public long part1(Stream<Sensor> sensors, int rowOfInterest) {
+        final var grid = Grid.empty().withRowOfInterest(rowOfInterest);
         sensors.forEach(grid::withSensor);
-        print(grid.prettyPrint());
+        if (rowOfInterest == 10) // actual input is too large for printing
+            print(grid.prettyPrint());
 
-        return (int) grid.map().entrySet().stream()
-                .filter(it -> it.getKey().y() == 10)
+        return grid.map().entrySet().stream()
+                .filter(it -> it.getKey().y() == Grid.ROW_OF_INTEREST)
                 .filter(it -> it.getValue() == Cell.MARKED)
                 .count();
     }
