@@ -29,7 +29,12 @@ public class Day14 {
         }
     }
 
-    public record Coordinate(int x, int y) implements Comparable<Coordinate> {
+    public interface ICoordinate {
+        int x();
+        int y();
+    }
+
+    public record Coordinate(int x, int y) implements ICoordinate, Comparable<Coordinate> {
         private static final Pattern PATTERN = Pattern.compile("\\d+,\\d+");
 
         public static Coordinate from(int x, int y) {
@@ -104,7 +109,7 @@ public class Day14 {
             return new Boundaries(MAX_VALUE, MIN_VALUE, MAX_VALUE, MIN_VALUE);
         }
 
-        public Boundaries with(Coordinate coordinate) {
+        public Boundaries with(ICoordinate coordinate) {
             if (coordinate.x() < xMin) return new Boundaries(coordinate.x(), xMax, yMin, yMax).with(coordinate);
             if (coordinate.x() > xMax) return new Boundaries(xMin, coordinate.x(), yMin, yMax).with(coordinate);
             if (coordinate.y() < yMin) return new Boundaries(xMin, xMax, coordinate.y(), yMax).with(coordinate);
@@ -150,14 +155,14 @@ public class Day14 {
                 for (Coordinate coordinate : prev.inBetween(next)) {
                     if (ENABLE_DEBUG_LOGGING && map.containsKey(coordinate))
                         Util.printfln("DEBUG: Coordinate %s is already in use", coordinate);
-                    addInternal(coordinate, Cell.WALL);
+                    putInternally(coordinate, Cell.WALL);
                 }
                 prev = next;
             }
         }
 
         public Grid withSource() {
-            addInternal(SOURCE_POSITION, Cell.SOURCE);
+            putInternally(SOURCE_POSITION, Cell.SOURCE);
             return this;
         }
 
@@ -193,11 +198,11 @@ public class Day14 {
                 }
             }
             if (!isFallingEndless) {
-                addInternal(simulation.getAndUpdate(Simulation::next).position, Cell.SAND);
+                putInternally(simulation.getAndUpdate(Simulation::next).position, Cell.SAND);
                 return true;
             }
 
-            path.forEach(p -> addInternal(p, Cell.SLOPE));
+            path.forEach(p -> putInternally(p, Cell.SLOPE));
             return false;
         }
 
@@ -205,7 +210,7 @@ public class Day14 {
             return map.getOrDefault(coordinate, Cell.EMPTY).isEmpty();
         }
 
-        private void addInternal(Coordinate coordinate, Cell cell) {
+        private void putInternally(Coordinate coordinate, Cell cell) {
             boundaries.getAndUpdate(b -> b.with(coordinate));
             map.put(coordinate, cell);
         }
@@ -213,11 +218,11 @@ public class Day14 {
         public String prettyPrint() {
             StringBuilder sb = new StringBuilder();
             final var b = boundaries().get();
-            final var xDiff = b.xMax - b.xMin;
-            final var yDiff = b.yMax - b.yMin;
+            final var xDiff = b.xMax() - b.xMin();
+            final var yDiff = b.yMax() - b.yMin();
             for (int dy = 0; dy <= yDiff; dy++) {
                 for (int dx = 0; dx <= xDiff; dx++) {
-                    sb.append(map.getOrDefault(Coordinate.from(b.xMin + dx, b.yMin + dy), Cell.EMPTY));
+                    sb.append(map.getOrDefault(Day14.Coordinate.from(b.xMin() + dx, b.yMin() + dy), Day14.Cell.EMPTY));
                 }
                 sb.append("\n");
             }
@@ -233,7 +238,7 @@ public class Day14 {
             final int rockBottom = getRockBottom() + 2;
             IntStream.rangeClosed(SOURCE_POSITION.x - rockBottom - 1, SOURCE_POSITION.x + rockBottom + 1)
                     .mapToObj(x -> Coordinate.from(x, rockBottom))
-                    .forEach(coordinate -> addInternal(coordinate, Cell.WALL));
+                    .forEach(coordinate -> putInternally(coordinate, Cell.WALL));
             return this;
         }
     }
