@@ -4,15 +4,19 @@ package tech.dobler.aoc22;
 import tech.dobler.aoc22.Day14.Boundaries;
 import tech.dobler.aoc22.Day14.ICoordinate;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.Math;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static tech.dobler.aoc22.Util.print;
+import static tech.dobler.aoc22.Util.*;
 
 
 public class Day15 {
@@ -52,14 +56,20 @@ public class Day15 {
     public record Beacon(Coordinate position) {
     }
 
-    public record Sensor(Coordinate position, Beacon beacon) {
+    public record Sensor(Coordinate position, Beacon beacon, int distance) {
+        public static Sensor of(Coordinate... coordinates) {
+            if (coordinates.length != 2)
+                throw new IllegalArgumentException("Sensor requires 2 coordinates! But got %s".formatted(Arrays.toString(coordinates)));
+            return new Sensor(coordinates[0], new Beacon(coordinates[1]), coordinates[0].distance(coordinates[1]));
+        }
+
         public static Sensor parse(String line) {
             final var coordinates = Coordinate.PATTERN.matcher(line)
                     .results()
                     .map(MatchResult::group)
                     .map(Coordinate::of)
-                    .toList();
-            return new Sensor(coordinates.get(0), new Beacon(coordinates.get(1)));
+                    .toArray(Coordinate[]::new);
+            return Sensor.of(coordinates);
         }
     }
 
@@ -82,16 +92,10 @@ public class Day15 {
         }
     }
 
-    public record Grid(Map<Coordinate, Cell> map, AtomicReference<Boundaries> boundaries) {
-        public static int ROW_OF_INTEREST = 2_000_000;
+    public record SemiEagerGrid(Map<Coordinate, Cell> map, AtomicReference<Boundaries> boundaries, int rowOfInterest) {
 
-        public static Grid empty() {
-            return new Grid(new HashMap<>(), new AtomicReference<>(Day14.Boundaries.empty()));
-        }
-
-        public Grid withRowOfInterest(int rowOfInterest) {
-            Grid.ROW_OF_INTEREST = rowOfInterest; // NOSONAR
-            return this;
+        public static SemiEagerGrid empty(int rowOfInterest) {
+            return new SemiEagerGrid(new HashMap<>(), new AtomicReference<>(Day14.Boundaries.empty()), rowOfInterest);
         }
 
         public void withSensor(Sensor sensor) {
@@ -102,27 +106,27 @@ public class Day15 {
 
         private void placeMarkers(Sensor sensor) {
             var currentPosition = sensor.position();
-            final var dist = currentPosition.distance(sensor.beacon().position());
-            if (currentPosition.y() - dist - 1 > ROW_OF_INTEREST
-                    || currentPosition.y() + dist + 1 < ROW_OF_INTEREST) {
+            final var dist = sensor.distance();
+            if (currentPosition.y() - dist - 1 > rowOfInterest
+                    || currentPosition.y() + dist + 1 < rowOfInterest) {
                 return;
             }
 
-            var startingBoundry = Math.max(0, dist - currentPosition.y());
+            var startingBoundry = 0;//Math.max(0, dist - currentPosition.y());
             for (int dy = startingBoundry; dy < dist + 1; dy++) {
 
                 // Draw upper pyramid
-                if (currentPosition.y() - dy == ROW_OF_INTEREST) {
+                if (currentPosition.y() - dy == rowOfInterest) {
                     for (int dx = 2 * dy - dist; dx < dist + 1; dx++) {
                         tryPlaceMarker(currentPosition.add(Coordinate.from(dx - dy, -dy)));
                     }
                     break;
                 }
             }
-            startingBoundry = Math.max(1, dist - currentPosition.y());
+            startingBoundry = 1;//Math.max(1, dist - currentPosition.y());
             for (int dy = startingBoundry; dy < dist + 1; dy++) {
                 // Draw lower pyramid
-                if (currentPosition.y() + dy == ROW_OF_INTEREST) {
+                if (currentPosition.y() + dy == rowOfInterest) {
                     for (int dx = 2 * dy - dist; dx < dist + 1; dx++) {
                         tryPlaceMarker(currentPosition.add(Coordinate.from(dx - dy, dy)));
                     }
@@ -159,24 +163,123 @@ public class Day15 {
         }
     }
 
-    public static Stream<Sensor> parseInput(Stream<String> input) {
-        return input.map(Sensor::parse);
+    public static List<Sensor> parseInput(Stream<String> input) {
+        return input.map(Sensor::parse).toList();
     }
 
-
-    public long part1(Stream<Sensor> sensors, int rowOfInterest) {
-        final var grid = Grid.empty().withRowOfInterest(rowOfInterest);
+    public long part1(List<Sensor> sensors, int rowOfInterest) {
+        final var grid = SemiEagerGrid.empty(rowOfInterest);
         sensors.forEach(grid::withSensor);
-        if (rowOfInterest == 10) // actual input is too large for printing
+        if (false && rowOfInterest == 10) // puzzle input is too large for printing
             print(grid.prettyPrint());
 
         return grid.map().entrySet().stream()
-                .filter(it -> it.getKey().y() == Grid.ROW_OF_INTEREST)
+                .filter(it -> it.getKey().y() == rowOfInterest)
                 .filter(it -> it.getValue() == Cell.MARKED)
                 .count();
     }
 
-    public int part2(Stream<Sensor> sensors) {
-        return -1;
+    // On my current hardware it would take approximately 11-30 days to finish computing.
+    // Well, or not: Parsing 0,042 percent took 1187,650 s (approx till end: 785,483197 h)
+    //    Exception in thread "main" java.lang.OutOfMemoryError
+    public long part2_LOL(List<Sensor> sensors, int upperBound) {
+
+        // In Part 1 we started with creating an grid eagerly.
+        // When the execution (and rendering) of the actual input didn't finished in 2 min,
+        // we restricted the evaluation to only the row on interest.
+        //
+        // In Part 2 we need to fill not an row of interest but a square and then find one space where an beacon can be.
+        // For that we need to evaluate the cells by iterating over all sensors and determine whether it lies in its circumference.
+        // We should also consider using an lookup map for the distance, because we will
+        final var map = sensors.stream()
+                .map(Sensor::position)
+                .collect(Collectors.toMap(it -> it, __ -> Cell.SENSOR));
+        sensors.stream()
+                .map(s -> s.beacon().position())
+                .distinct()
+                .collect(Collectors.toMap(it -> it, __ -> Cell.BEACON))
+                .forEach((k, v) -> map.merge(k, v, (v1, v2) -> v2));
+        final var maxIterations = (1 + upperBound) * (long) (1 + upperBound);
+        printfln("Iterating %d times", maxIterations);
+        return positionInListToFrequency(upperBound + 1, crunchTheNumbers(upperBound, maxIterations, map, sensors) - 1);
+    }
+
+    private static long crunchTheNumbers(int upperBound, long maxIterations, Map<Coordinate, Cell> map, List<Sensor> sensors) {
+        final var counter = new AtomicLong();
+        final var timer = System.currentTimeMillis();
+        return makeSquareCoordinateStreamOfBoundingArea(upperBound)
+                .map(pos -> {
+                    /*synchronized (counter)*/
+                    {
+                        if (counter.incrementAndGet() % 1_600_000_000 == 0) {
+                            final double fraction = ((double) counter.get()) / maxIterations;
+                            final long deltaTime = System.currentTimeMillis() - timer;
+                            printf("Parsing %.3f percent", fraction * 100);
+                            printfln(" took %.3f s (approx till end: %f h)", deltaTime / 1000.0, (deltaTime / fraction / 1000.0 / 3600));
+                        }
+                    }
+                    return map.getOrDefault(pos,
+                            sensors.stream()
+                                    .filter(s -> distanceCheck(pos, s))
+                                    .findFirst()
+                                    .map(__ -> Cell.MARKED)
+                                    .orElse(Cell.EMPTY)
+                    );
+                })
+                .map(it -> it != Cell.EMPTY)
+                .takeWhile(it -> it)
+                .count();
+    }
+
+    private static long positionInListToFrequency(int upperBound, long position) {
+        final var y = position / upperBound;
+        final var x = position - y * upperBound;
+        return (1 + x) * 4000000L + y;
+    }
+
+    private static boolean distanceCheck(Coordinate pos, Sensor s) {
+        final var distance = pos.distance(s.position());
+        return distance <= s.distance();
+    }
+
+    public long part2(List<Sensor> sensors, int upperBound) {
+        int y = 0;
+        int x = 0;
+        int i = 0;
+        for (; i < upperBound; i++) {
+            if (i % Math.min(upperBound/10, 10) == 0) {
+                printfln("Processed: %.6f percent", 100.0*i/upperBound);
+            }
+            final var result = checkLineForEmpty(sensors, i, upperBound);
+            if (-1 + result != upperBound) {
+                x = result;
+                printfln("->%d", result);
+                break;
+            }
+            y++;
+        }
+        return x * 4000000L + y;
+    }
+
+    private int checkLineForEmpty(List<Sensor> sensors, int rowOfInterest, int bound) {
+        final var grid = SemiEagerGrid.empty(rowOfInterest);
+        sensors.forEach(grid::withSensor);
+        final var counter = new AtomicInteger();
+        return (int) grid.map().entrySet().stream()
+                .filter(it -> it.getKey().y() == rowOfInterest)
+                .filter(it -> it.getKey().x() >= 0 && it.getKey().x() <= bound)
+                .sorted(Entry.comparingByKey())
+                .map(Entry::getKey)
+                .takeWhile(it -> it.x == counter.getAndIncrement())
+                .count();
+    }
+
+    private static Stream<Coordinate> makeSquareCoordinateStreamOfBoundingArea(int upperBound) {
+        return IntStream.rangeClosed(0, upperBound)
+                .boxed()
+                .flatMap(y -> IntStream.rangeClosed(0, upperBound)
+                        .boxed()
+                        .map(x -> new Coordinate(x, y)))
+                .parallel();
     }
 }

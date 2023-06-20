@@ -3,7 +3,6 @@ package tech.dobler.aoc22;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import tech.dobler.aoc22.Day15.Beacon;
 import tech.dobler.aoc22.Day15.Coordinate;
 import tech.dobler.aoc22.Day15.Sensor;
 
@@ -49,9 +48,9 @@ class Day15Test {
             final var sensor = Sensor.parse("Sensor at x=2, y=18: closest beacon is at x=-2, y=15");
 
             assertThat(sensor).isEqualTo(
-                    new Sensor(
-                            Coordinate.from(2, 18), new
-                            Beacon(Coordinate.from(-2, 15))));
+                    Sensor.of(
+                            Coordinate.from(2, 18),
+                            Coordinate.from(-2, 15)));
         }
     }
 
@@ -60,7 +59,7 @@ class Day15Test {
         print("################################# Test input ####################################");
         assertThat(day.part1(parseInput(Util.splitByNewLine(testInput)), 10)).isEqualTo(26);
 
-        print("################################# Actual input ####################################");
+        print("################################# Puzzle input ####################################");
         assertThat(day.part1(parseInput(readInput()), 2000000))
                 .isLessThan(5_024_155)
                 .isLessThan(4_811_306)
@@ -69,8 +68,10 @@ class Day15Test {
 
     @Test
     void part2() {
-        assertThat(day.part2(parseInput(Util.splitByNewLine(testInput)))).isEqualTo(56000011);
+        print("################################# Test input ####################################");
+        assertThat(day.part2(parseInput(Util.splitByNewLine(testInput)), 20)).isEqualTo(56000011);
 
-        assertThat(day.part2(parseInput(readInput()))).isEqualTo(-1);
+        print("################################# Puzzle input ####################################");
+        assertThat(day.part2(parseInput(readInput()), 4_000_000)).isEqualTo(-1);
     }
 }
