@@ -7,6 +7,8 @@ import tech.dobler.aoc22.Day14.ICoordinate;
 import java.lang.Math;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -246,11 +248,9 @@ public class Day15 {
         int y = 0;
         int x = 0;
         int i = 0;
+        final var results = crunchNumbersInThreads(sensors, upperBound);
         for (; i < upperBound; i++) {
-            if (i % Math.min(upperBound/10, 10) == 0) {
-                printfln("Processed: %.6f percent", 100.0*i/upperBound);
-            }
-            final var result = checkLineForEmpty(sensors, i, upperBound);
+            final var result = results[i];
             if (-1 + result != upperBound) {
                 x = result;
                 printfln("->%d", result);
@@ -259,6 +259,47 @@ public class Day15 {
             y++;
         }
         return x * 4000000L + y;
+    }
+
+    private int[] crunchNumbersInThreads(List<Sensor> sensors, int upperBound) {
+        final var results = new int[upperBound + 1];
+        final AtomicBoolean stop = new AtomicBoolean();
+        final var futures = new Future[upperBound];
+        final var executor = Executors.newFixedThreadPool(6);
+        final var timer = System.currentTimeMillis();
+        for (int i = 0; i < upperBound; i++) {
+            final int index = i;
+            futures[i] = executor.submit(() -> {
+                final var result = checkLineForEmpty(sensors, index, upperBound);
+                printfln("Finished %d", index);
+                if (index % 10 == 0) {
+                    printfln("Took %.4f s", (System.currentTimeMillis() - timer)/1000.0);
+                }
+                results[index] = result;
+                if (-1 + result != upperBound) {
+                    printfln("From Thread: ->%d", result);
+                    stop.set(true);
+                }
+            });
+        }
+
+        try {
+            for (Future future : futures) {
+                if (future.isCancelled()) continue;
+                if (stop.get()) {
+                    print("Canceling all threads!");
+                    for (Future f : futures) {
+                        f.cancel(true);
+                    }
+                }
+                future.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
+        executor.close();
+        return results;
     }
 
     private int checkLineForEmpty(List<Sensor> sensors, int rowOfInterest, int bound) {
