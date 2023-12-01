@@ -1,6 +1,10 @@
+package tech.dobler.aoc23;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import tech.dobler.aoc23.Day01;
+import tech.dobler.aoc23.Util;
 
 import java.util.stream.Stream;
 
@@ -62,19 +66,19 @@ class Day01Test {
         assertThat(day.preprocess("sevenine")).isEqualTo("79e");
     }
 
-    @Disabled
+    @Disabled("Fails because it's technically wrong")
     @Test
     void preprocess3() {
         assertThat(day.preprocess("abcone2threexyz")).isEqualTo("abc123xyz");
     }
 
-    @Disabled
+    @Disabled("Fails because it's technically wrong")
     @Test
     void preprocessReddit1() {
         assertThat(day.preprocess("eighthree")).isEqualTo("83");
     }
 
-    @Disabled
+    @Disabled("Fails because it's technically wrong")
     @Test
     void preprocess5() {
         assertThat(day.preprocess("4nineeightseven2")).isEqualTo("49872");

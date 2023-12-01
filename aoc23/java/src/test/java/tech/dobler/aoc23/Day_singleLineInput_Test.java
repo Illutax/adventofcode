@@ -1,6 +1,10 @@
+package tech.dobler.aoc23;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import tech.dobler.aoc23.Day01;
+import tech.dobler.aoc23.Util;
 
 //import static org.assertj.core.api.Assertions.assertThat;
 

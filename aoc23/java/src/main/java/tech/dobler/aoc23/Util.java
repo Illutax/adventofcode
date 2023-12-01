@@ -1,3 +1,5 @@
+package tech.dobler.aoc23;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

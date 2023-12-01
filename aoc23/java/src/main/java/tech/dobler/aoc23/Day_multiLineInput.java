@@ -1,3 +1,5 @@
+package tech.dobler.aoc23;
+
 import java.util.stream.Stream;
 
 public class Day_multiLineInput {

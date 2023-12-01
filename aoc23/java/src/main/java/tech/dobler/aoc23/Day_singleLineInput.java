@@ -1,3 +1,5 @@
+package tech.dobler.aoc23;
+
 public class Day_singleLineInput
 {
     public int part1(String input)

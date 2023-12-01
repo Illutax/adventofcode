@@ -1,3 +1,5 @@
+package tech.dobler.aoc23;
+
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -24,6 +26,7 @@ public class Day01 {
             "seven", "7","eight", "8","nine", "9"
     );
 
+    @SuppressWarnings({"ReassignedVariable", "java:S127"})
     String preprocess(String line) {
         final var sb = new StringBuilder();
         for (int i = 0; i < line.length(); i++) {
