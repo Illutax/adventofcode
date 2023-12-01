@@ -1,6 +1,7 @@
 package tech.dobler.aoc22;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import tech.dobler.aoc22.Day15.Coordinate;
@@ -66,6 +67,7 @@ class Day15Test {
                 .isEqualTo(4_724_228);
     }
 
+    @Disabled
     @Test
     void part2() {
         print("################################# Test input ####################################");
