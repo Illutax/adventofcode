@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import tech.dobler.aoc23.Day01;
-import tech.dobler.aoc23.Util;
+//import tech.dobler.aoc23.Util;
 
 //import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,12 +12,12 @@ class Day_singleLineInput_Test {
 
     final String testInput = """
             """;
-    private Day01 day;
+//    private Day01 day;
 
     @BeforeEach
-    void setUp() {
-        day = new Day01();
-    }
+//    void setUp() {
+//        day = new Day01();
+//    }
 
     private static String readInput() {
         return Util.readInput(1);
