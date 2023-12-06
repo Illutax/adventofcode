@@ -1,7 +1,13 @@
 package tech.dobler.aoc23;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 public class Day03 {
     public int part1(String input) {
@@ -11,8 +17,10 @@ public class Day03 {
     }
 
     record Grid(List<Part> parts, List<Symbol> symbols) {
+        private static final Pattern NUMBER_PATTERN = Pattern.compile("(\\d+).*");
+
+        @SuppressWarnings({"ReassignedVariable", "java:S127"})
         public static Grid of(String input) {
-            final var pattern = Pattern.compile("(\\d+).*");
             List<Part> parts = new ArrayList<>();
             List<Symbol> symbols = new ArrayList<>();
             String[] rows = input.split("\n");
@@ -25,7 +33,7 @@ public class Day03 {
                         continue;
                     }
                     if (Character.isDigit(cell.charAt(0))) {
-                        var matcher = pattern.matcher(row.substring(x));
+                        var matcher = NUMBER_PATTERN.matcher(row.substring(x));
                         if (!matcher.matches())
                             throw new IllegalStateException("Coudln't find part in %s starting at %d".formatted(row, x));
                         var partNumber = matcher.group(1);
@@ -54,30 +62,35 @@ public class Day03 {
         }
 
         public Long gearRatios() {
-            var partsWithGears = parts.stream()
-                    .filter(part -> part.symbols().stream().anyMatch(Symbol::isGear))
-                    .toList();
-            final var map = new HashMap<Symbol, List<Part>>();
-            partsWithGears.forEach(part -> part.symbols().stream()
-                    .filter(Symbol::isGear)
-                    .forEach(gear -> map.computeIfAbsent(gear, __ -> new ArrayList<>()).add(part)));
-            return map.values().stream()
+            return parts.stream()
+                    .flatMap(part -> part.symbols.stream()
+                            .filter(Symbol::isGear)
+                            .map(symbol -> new AbstractMap.SimpleEntry<>(symbol, part)))
+                    .collect(Collectors.groupingBy(
+                            AbstractMap.SimpleEntry::getKey,
+                            mapping(AbstractMap.SimpleEntry::getValue, toList())))
+                    .values().stream()
                     .filter(partList -> partList.size() == 2)
-                    .mapToLong(partList -> partList.stream().mapToLong(Part::number).reduce(1L, (a, b) -> a * b))
+                    .mapToLong(Grid::getProductOfPartNumbers)
                     .sum();
+        }
 
+        private static long getProductOfPartNumbers(List<Part> partList) {
+            return partList.stream()
+                    .mapToLong(Part::number)
+                    .reduce(1L, Util.Math::multiply);
         }
     }
 
     record Part(Pos pos, int number, List<Symbol> symbols) {
         public void process(List<Symbol> symbolsToCheck) {
-            var length = (int)Math.log10(number) + 1;
+            var length = (int) Math.log10(number) + 2;
             for (Symbol symbol : symbolsToCheck) {
                 if (symbol.pos.x > pos.x - 2
-                        && symbol.pos.x < pos.x + length + 1
+                        && symbol.pos.x < pos.x + length
                         && symbol.pos.y > pos.y - 2
                         && symbol.pos.y < pos.y + 2) {
-                        this.symbols.add(symbol);
+                    this.symbols.add(symbol);
                 }
             }
         }
