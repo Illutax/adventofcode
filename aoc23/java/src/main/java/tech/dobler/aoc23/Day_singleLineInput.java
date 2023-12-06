@@ -2,12 +2,12 @@ package tech.dobler.aoc23;
 
 public class Day_singleLineInput
 {
-    public int part1(String input)
+    public long part1(String input)
     {
         return -1;
     }
 
-    public int part2(String input) {
+    public long part2(String input) {
         return -1;
     }
 }
