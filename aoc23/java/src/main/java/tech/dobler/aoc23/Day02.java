@@ -48,7 +48,7 @@ public class Day02 {
 
         public static Bag of(String set) {
             Matcher matcher = PATTERN.matcher(set);
-            if (!matcher.matches()) throw new IllegalStateException("Shouldn't happen");
+            Util.requirePatternMatches(set, matcher);
             int red = 0;
             int green = 0;
             int blue = 0;

@@ -34,8 +34,7 @@ public class Day03 {
                     }
                     if (Character.isDigit(cell.charAt(0))) {
                         var matcher = NUMBER_PATTERN.matcher(row.substring(x));
-                        if (!matcher.matches())
-                            throw new IllegalStateException("Coudln't find part in %s starting at %d".formatted(row, x));
+                        Util.requirePatternMatches(row.substring(x), matcher);
                         var partNumber = matcher.group(1);
                         Part newPart = new Part(new Pos(x, y), Integer.parseInt(partNumber), new ArrayList<>());
                         parts.add(newPart);

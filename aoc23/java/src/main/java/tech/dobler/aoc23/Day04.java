@@ -25,7 +25,7 @@ public class Day04 {
 
         public static Card of(String line) {
             Matcher matcher = PATTERN.matcher(line);
-            if (!matcher.matches()) throw new IllegalStateException("Couldn't match card with '%s'".formatted(line));
+            Util.requirePatternMatches(line, matcher);
             if (matcher.groupCount() != 3)
                 throw new IllegalStateException("Expected three groups but got %d".formatted(matcher.groupCount()));
             int id = Integer.parseInt(matcher.group(1));
