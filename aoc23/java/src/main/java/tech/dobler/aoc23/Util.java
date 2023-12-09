@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public class Util {
     private Util() {
     }
@@ -34,7 +35,6 @@ public class Util {
         return splitBy("\n\n", testInput).map(transformer);
     }
 
-    @SuppressWarnings("unused")
     public static <T> Stream<T> splitBy(String regex, String testInput, Function<String, T> transformer) {
         return splitBy(regex, testInput).map(transformer);
     }
@@ -122,6 +122,10 @@ public class Util {
 
         public static long multiply(long a, long b) {
             return a * b;
+        }
+
+        public static Long difference(long a, long b) {
+            return a - b;
         }
     }
 }
