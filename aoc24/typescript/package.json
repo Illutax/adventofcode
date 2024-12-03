@@ -1,0 +1,13 @@
+{
+  "name": "typescript",
+  "version": "1.0.0",
+  "scripts": {
+    "watch": "npx tsc --watch",
+    "build": "npx tsc",
+    "test": "npm run build && node"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest"
+  }
+}
