@@ -21,7 +21,7 @@ console.log(parsedTestResult);
 const part1Test = part1(parsedTestResult);
 Assert.isEqual(-1, part1Test)
 
-const parsedResult = parse(getInput(1));
+const parsedResult = parse(getInput(0));
 console.log(parsedResult);
 const part1Result = part1(parsedResult);
 Assert.isEqual(-1, part1Result);
