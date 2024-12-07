@@ -3,6 +3,10 @@ export class Assert {
         if (!expression) throw new Error(`Assertion failed! Expected: Expression to be true. ${message}`);
     }
 
+    public static notNull(value: object | undefined | null, name: string| undefined) {
+        if (value == null) throw new Error(`Expected Name to be set ${name}`);
+    }
+
     public static isEqual(expected: number, actual: number) {
         if (expected != actual) throw new Error(`Assertion failed! Expected: ${expected} to be equal to ${actual}`);
     }

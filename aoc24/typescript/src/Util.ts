@@ -7,9 +7,23 @@ export class Util {
         console.log(`Read ${content.length} characters`);
         return content;
     }
+
+    public static timed(callback: () => void, label: string | undefined = undefined) {
+        const start = new Date().getTime();
+        callback();
+        const end = new Date().getTime();
+        const deltaSeconds = (end-start)/1000;
+
+        const prefix = label? label+": " : "";
+        console.log(`${prefix}took ${deltaSeconds}s`);
+    }
 }
 
 export function getInput(day: number)
 {
     return Util.getInput(day);
+}
+
+export function timed(callback: () => void, label: string | undefined) {
+    return Util.timed(callback, label);
 }
