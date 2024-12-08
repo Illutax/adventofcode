@@ -48,7 +48,6 @@ class CalibrationEquation {
         }
         const product = this.solveInternal(operators.concat(Operator.MULT));
         const sum = this.solveInternal(operators.concat(Operator.PLUS));
-        // console.log(`Trying to decide for ${this.result} between ${product} and ${sum}`, this.operands, operators)
         return product == this.result ? product : sum;
     }
 
@@ -63,7 +62,6 @@ class CalibrationEquation {
         const product = this.solveInternal2(operators.concat(Operator.MULT));
         const sum = this.solveInternal2(operators.concat(Operator.PLUS));
         const concat = this.solveInternal2(operators.concat(Operator.CONC));
-        // console.log(`Trying to decide for ${this.result} between ${product}, ${sum} and ${concat}`, this.operands, operators)
         if (product == this.result) {
             return product;
         } else if (sum == this.result) {

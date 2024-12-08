@@ -17,8 +17,7 @@ const testInput = `....#.....
 enum Cell {
     EMPTY = '.',
     OBSTACLE = '#',
-    START = '^',
-    NEW_OBSTRUCTION = 'O'
+    START = '^'
 }
 
 class Grid {
@@ -73,10 +72,6 @@ class Grid {
 
     set newObstacle(value: Vec2 | undefined) {
         this._newObstacle = value;
-    }
-
-    public printStart() {
-        console.log(this.cells.map(row => row.join("")).join("\n"))
     }
 
     public printTraversed() {
@@ -206,9 +201,9 @@ function part2(input: Grid): number {
 
             if (!alreadyExists) {
                 allExistingConfigurations.push(newConfiguration);
-                console.log(`Accepting:`, newConfiguration.length);
+                // console.log(`Accepting:`, newConfiguration.length);
             } else {
-                console.log(`Rejecting:`, newConfiguration.length);
+                // console.log(`Rejecting:`, newConfiguration.length);
             }
         }
     });
@@ -227,7 +222,6 @@ class Configuration {
 
         return containsAll(this._posDirs, other._posDirs) && containsAll(other._posDirs, this._posDirs);
     }
-
 
     get length(): number {
         return this._posDirs.length;

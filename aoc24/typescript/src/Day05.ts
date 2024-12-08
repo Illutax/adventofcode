@@ -122,12 +122,10 @@ function parse(input: string): PrintQueue {
 
 // Part1
 const parsedTestResult = parse(testInput);
-// console.log(parsedTestResult);
 const part1Test = parsedTestResult.part1();
 Assert.isEqual(143, part1Test)
 
 const parsedResult = parse(getInput(5));
-// console.log(parsedResult);
 const part1Result = parsedResult.part1();
 Assert.isEqual(6041, part1Result);
 

@@ -16,15 +16,11 @@ import java.util.stream.Stream;
 public class Day06 {
 
     public enum Cell {
-        EMPTY("."),
-        OBSTACEL("#"),
-        START("^"),
-        NEW_OBSTRUCTION("O");
+        EMPTY,
+        OBSTACEL,
+        START;
 
-        private final String type;
-
-        Cell(String type) {
-            this.type = type;
+        Cell() {
         }
 
         public static Cell from(String cell) {
@@ -32,13 +28,8 @@ public class Day06 {
                 case "." -> Cell.EMPTY;
                 case "#" -> Cell.OBSTACEL;
                 case "^" -> Cell.START;
-                case "O" -> Cell.NEW_OBSTRUCTION;
                 default -> throw new IllegalStateException("Unexpected value: " + cell);
             };
-        }
-
-        public String getType() {
-            return type;
         }
     }
 
@@ -98,7 +89,6 @@ public class Day06 {
                         this.getCellAtGuardsPosition().map(cell -> !cell.equals(Cell.OBSTACEL)).orElse(false)) { // path is clear
                     this.visit(this.guardPosition);
                     this.guardPosition = this.guardPosition.plus(this.guardOrientation);
-//                    System.out.println(this.amountOfTraversedUniqueCells());
                 }
                 if (this.getCellAtGuardsPosition().isEmpty()) return; // inside grid, REALLY? //FIXME
                 this.guardPosition = this.guardPosition.plus(this.guardOrientation.mult(-1));
@@ -117,7 +107,6 @@ public class Day06 {
                                 this.getCellAtGuardsPosition().map(cell -> !cell.equals(Cell.OBSTACEL)).orElse(false) &&
                                 !this.guardPosition.equals(this.newObstacle)) {
                     if (visited.contains(PosAndDir.of(this.guardPosition, this.guardOrientation))) {
-                        // console.log("Returned to a known position and orientation")
                         return visited;
                     }
                     visited.add(PosAndDir.of(this.guardPosition, this.guardOrientation));
@@ -142,11 +131,7 @@ public class Day06 {
         }
 
         private void visit(Vec2 pos) {
-            var row = this.visitedCells[pos.y()];
-//            if (!row) {
-//                row = this.visitedCells[pos.y()] = new boolean[];
-//            }
-            row[pos.x()] = true;
+            this.visitedCells[pos.y()][pos.x()] = true;
         }
 
         private Optional<Cell> getCellAtGuardsPosition() {
@@ -159,7 +144,7 @@ public class Day06 {
         }
     }
 
-    record PosAndDir(Vec2 pos, Vec2 dir) {
+    public record PosAndDir(Vec2 pos, Vec2 dir) {
         private static final Map<String, PosAndDir> cache = new HashMap<>();
 
         public static PosAndDir of(Vec2 pos, Vec2 dir) {
@@ -191,6 +176,7 @@ public class Day06 {
             var newConfiguration = grid.loops();
             if (!newConfiguration.isEmpty()) {
                 allExistingConfigurations.add(new Configuration(newConfiguration));
+                log.info("Accepting: {}", newConfiguration.size());
             }
         });
 
