@@ -23,6 +23,10 @@ export class Vec2 {
         return Vec2.of(this.x + dir.x, this.y + dir.y);
     }
 
+    minus(dir: Vec2) {
+        return Vec2.of(this.x - dir.x, this.y - dir.y);
+    }
+
     mult(factor: number) {
         return Vec2.of(this.x * factor, this.y * factor)
     }

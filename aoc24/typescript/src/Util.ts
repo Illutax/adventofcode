@@ -24,6 +24,17 @@ export function getInput(day: number)
     return Util.getInput(day);
 }
 
+
+/**
+ *
+ * @param map
+ * @param key
+ * @param value
+ */
+export function addIfAbsent(map: Map<string, object[]>, key: string, value: object) {
+    map.set(key, [...(map.get(key) || []), value]);
+}
+
 export function timed(callback: () => void, label: string | undefined) {
     return Util.timed(callback, label);
 }

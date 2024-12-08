@@ -1,6 +1,7 @@
 import { Assert } from "./Assert";
-import { getInput, Util } from "./Util";
+import { getInput } from "./Util";
 import { of, Vec2 } from "./Vec2";
+import { PosAndDir } from "./PosDir";
 
 const testInput = `....#.....
 .........#
@@ -113,7 +114,7 @@ class Grid {
         }
     }
 
-    public loops() {
+    public loops(): Configuration {
         Assert.notNull(this.newObstacle, "newObstacle");
         this._guardPosition = this.startPosition;
         this._guardOrientation = this.cardinalDirections["^"];
@@ -123,14 +124,14 @@ class Grid {
                 this.getCellAtGuardsPosition() && // inside grid
                 this.getCellAtGuardsPosition() !== Cell.OBSTACLE &&
                 !this.guardPosition.equals(this.newObstacle!)) {
-                if (visited.find(it => it.pos.equals(this.guardPosition) && it.dir.equals(this._guardOrientation))) {
+                if (visited.find(it => PosAndDir.of(this.guardPosition, this._guardOrientation).equals(it))) {
                     // console.log("Returned to a known position and orientation")
-                    return visited;
+                    return new Configuration(visited);
                 }
                 visited.push(PosAndDir.of(this.guardPosition, this._guardOrientation));
                 this._guardPosition = this.guardPosition.plus(this._guardOrientation);
             }
-            if (this.getCellAtGuardsPosition() === undefined) return []; // inside grid
+            if (this.getCellAtGuardsPosition() === undefined) return new Configuration(); // inside grid
             this._guardPosition = this.guardPosition.plus(this._guardOrientation.mult(-1));
             this._guardOrientation = this._guardOrientation.rotateCW();
         }
@@ -153,25 +154,6 @@ class Grid {
 
     private getCellAtGuardsPosition() {
         return this.cells.at(this.guardPosition.y)?.at(this.guardPosition.x);
-    }
-}
-
-class PosAndDir {
-    private static readonly cache = new Map<string, PosAndDir>();
-
-    constructor(public readonly pos: Vec2, public readonly dir: Vec2) {
-    }
-
-    public static of(pos: Vec2, dir: Vec2) {
-        const cacheKey = `${pos.x},${pos.y}|${dir.x},${dir.y}`;
-        if (!this.cache.has(cacheKey)) {
-            this.cache.set(cacheKey, new PosAndDir(pos, dir));
-        }
-        return this.cache.get(cacheKey)!;
-    }
-
-    equals(other: PosAndDir): boolean {
-        return this === other || this.pos.equals(other.pos) && this.dir.equals(other.dir);
     }
 }
 
@@ -214,15 +196,13 @@ Assert.isEqual(4665, part1Result);
 function part2(input: Grid): number {
     const possibleLocationsForNewObstacle = input.possibleLocationsForNewObstacle();
     console.log(`Checking ${possibleLocationsForNewObstacle.length} possibleLocationsForNewObstacle`);
-    const allExistingConfigurations: PosAndDir[][] = [];
+    const allExistingConfigurations: Configuration[] = [];
     possibleLocationsForNewObstacle.forEach(newObstacle => {
         input.newObstacle = newObstacle;
         const newConfiguration = input.loops();
-        if (newConfiguration.length != 0) {
+        if (newConfiguration?.length > 0) {
             const alreadyExists = allExistingConfigurations.some(existingConfiguration =>
-                newConfiguration.length === existingConfiguration.length &&
-                existingConfiguration.every(existingPosAndDir => newConfiguration
-                    .some(newPosAndDir => newPosAndDir.equals(existingPosAndDir))));
+                existingConfiguration.equals(newConfiguration));
 
             if (!alreadyExists) {
                 allExistingConfigurations.push(newConfiguration);
@@ -234,6 +214,24 @@ function part2(input: Grid): number {
     });
 
     return allExistingConfigurations.length;
+}
+
+class Configuration {
+
+    constructor(public _posDirs: PosAndDir[] = []) {
+    }
+
+    public equals(other: Configuration) {
+        if (this._posDirs.length != other._posDirs.length) return false;
+        const containsAll = (arr1: PosAndDir[], arr2: PosAndDir[]) => arr2.every(arr2Item => arr1.includes(arr2Item));
+
+        return containsAll(this._posDirs, other._posDirs) && containsAll(other._posDirs, this._posDirs);
+    }
+
+
+    get length(): number {
+        return this._posDirs.length;
+    }
 }
 
 console.log(parsedTestResult);
