@@ -14,18 +14,29 @@ export class Util {
         const end = performance.now();
         const prefix = label ? label + ": " : "";
         const deltaMS = (end - start);
-        let deltaString = ""
+        let deltaString: string
         if (deltaMS > 60_000) {
             deltaString = `${(deltaMS / 60_000)}m`;
         } else if (deltaMS > 100) {
             deltaString = `${(deltaMS / 1000)}s`;
         } else if (deltaMS < 1) {
-            deltaString = `${deltaMS*1000}µs`;
+            deltaString = `${deltaMS * 1000}µs`;
         } else {
             deltaString = `${deltaMS}ms`;
         }
         console.log(`${prefix}took ` + deltaString);
         return result;
+    }
+
+    public static setOf<T>(...values: T[]) {
+        const set = new Set<T>();
+        values.forEach(value =>
+            set.add(value));
+        return set;
+    }
+
+    public static emptySet<T>() {
+        return this.setOf<T>();
     }
 }
 

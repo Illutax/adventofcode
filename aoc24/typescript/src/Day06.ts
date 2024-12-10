@@ -2,6 +2,7 @@ import { Assert } from "./Assert";
 import { getInput } from "./Util";
 import { of, Vec2 } from "./Vec2";
 import { PosAndDir } from "./PosDir";
+import { CardinalDirection } from "./CardinalDirection";
 
 const testInput = `....#.....
 .........#
@@ -21,18 +22,11 @@ enum Cell {
 }
 
 class Grid {
-    private readonly cardinalDirections = {
-        '^': of(0, -1), //NORTH
-        '>': of(1, 0), //EAST
-        'v': of(0, 1), //SOUTH
-        '<': of(-1, 0), //WEST
-    }
-
     private _visitedCells: boolean[][] = [];
     // @ts-ignore
     private readonly startPosition: Vec2;
     private _guardPosition: Vec2 = Vec2.ZERO;
-    private _guardOrientation = this.cardinalDirections["^"]
+    private _guardOrientation = CardinalDirection.NORTH.value
     private bounds: Vec2;
 
     private _newObstacle: Vec2 | undefined;
@@ -112,7 +106,7 @@ class Grid {
     public loops(): Configuration {
         Assert.notNull(this.newObstacle, "newObstacle");
         this._guardPosition = this.startPosition;
-        this._guardOrientation = this.cardinalDirections["^"];
+        this._guardOrientation = CardinalDirection.from("^").value;
         const visited: PosAndDir[] = [];
         while (true) {
             while (
