@@ -1,5 +1,5 @@
 import { Assert } from "./Assert";
-import { getInput } from "./Util";
+import { getInput, timed } from "./Util";
 
 const testInput = `190: 10 19
 3267: 81 40 27
@@ -81,10 +81,11 @@ function parse(input: string): CalibrationEquation[] {
     });
 }
 
-function part1(input: CalibrationEquation[]): number {
-    return input.filter(equation => equation.isSolvable())
+function part1(input: CalibrationEquation[]) {
+    return timed(() => input.filter(equation => equation.isSolvable())
         .map(it => it.result)
-        .reduce((a, b) => a + b, 0);
+        .reduce((a, b) => a + b, 0),
+        `Part1 ${input.length}`);
 }
 
 // Part1
@@ -97,10 +98,11 @@ const part1Result = part1(parsedResult);
 Assert.isEqual(42_283_209_483_350, part1Result);
 
 // Part2
-function part2(input: CalibrationEquation[]): number {
-    return input.filter(equation => equation.isSolvable2())
+function part2(input: CalibrationEquation[]) {
+    return timed(() => input.filter(equation => equation.isSolvable2())
         .map(it => it.result)
-        .reduce((a, b) => a + b, 0);
+        .reduce((a, b) => a + b, 0),
+        `Part2 ${input.length}`);
 }
 
 const part2Test = part2(parsedTestResult);

@@ -1,5 +1,5 @@
 import { Assert } from "./Assert";
-import { getInput } from "./Util";
+import { getInput, timed } from "./Util";
 
 const testInput = `47|53
 97|13
@@ -53,16 +53,18 @@ class PrintQueue {
     }
 
     public part1() {
-        return this.updates.filter(update => this.isValid(update))
+        return timed(()=>this.updates.filter(update => this.isValid(update))
             .map(update => update.middlePageNumber)
-            .reduce((a, b) => a + b, 0)
+            .reduce((a, b) => a + b, 0),
+            `Part1 Rules: ${this.rules.length} Updates: ${this.updates.length}`)
     }
 
     public part2() {
-        return this.updates.filter(update => !this.isValid(update))
+        return timed(() => this.updates.filter(update => !this.isValid(update))
             .map(update => this.reorder(update))
             .map(update => update.middlePageNumber)
-            .reduce((a, b) => a + b, 0)
+            .reduce((a, b) => a + b, 0),
+            `Part2 Rules: ${this.rules.length} Updates: ${this.updates.length}`);
     }
 
     private reorder(unorderedPage: PageUpdate): PageUpdate {

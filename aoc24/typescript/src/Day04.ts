@@ -1,5 +1,5 @@
 import { Assert } from "./Assert";
-import { getInput } from "./Util";
+import { getInput, timed } from "./Util";
 
 const smallTestInput = `..X...
 .SAMX.
@@ -19,8 +19,8 @@ MAMMMXMMMM
 MXMXAXMASX`;
 
 class Grid {
-    private readonly w: number;
-    private readonly h: number;
+    public readonly w: number;
+    public readonly h: number;
 
     constructor(public cells: string[][]) {
         this.h = cells.length;
@@ -90,25 +90,32 @@ class Grid {
 }
 
 // Part1
+function part1(input: Grid) {
+    return timed(() => input.countXMAS(), `Part 1: ${input.w}x${input.h}`);
+}
+
 const parsedSmallTestResult = Grid.of(smallTestInput);
 console.log(parsedSmallTestResult);
-const part1SmallTest = parsedSmallTestResult.countXMAS();
+const part1SmallTest = part1(parsedSmallTestResult);
 Assert.isEqual(4, part1SmallTest)
 
 const parsedTestResult = Grid.of(testInput);
 console.log(parsedTestResult);
-const part1Test = parsedTestResult.countXMAS();
+const part1Test = part1(parsedTestResult);
 Assert.isEqual(18, part1Test)
 
 const parsedResult = Grid.of(getInput(4));
 console.log(parsedResult);
-const part1Result = parsedResult.countXMAS();
+const part1Result = part1(parsedResult);
 Assert.isEqual(2370, part1Result);
 
 // Part2
-console.log(parsedTestResult);
-const part2Test = parsedTestResult.countMAS();
+function part2(input: Grid) {
+    return input.countMAS();
+}
+
+const part2Test = part2(parsedTestResult);
 Assert.isEqual(9, part2Test);
 
-const part2Result = parsedResult.countMAS();
+const part2Result = part2(parsedResult);
 Assert.isEqual(1908, part2Result);

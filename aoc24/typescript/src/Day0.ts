@@ -16,14 +16,14 @@ function part1(input: any[]): number {
 }
 
 // Part1
-const parsedTestResult = parse(testInput);
-console.log(parsedTestResult);
-const part1Test = part1(parsedTestResult);
+const parsedTestInput = parse(testInput);
+console.log(parsedTestInput);
+const part1Test = part1(parsedTestInput);
 Assert.isEqual(-1, part1Test)
 
-const parsedResult = parse(getInput(0));
-console.log(parsedResult);
-const part1Result = part1(parsedResult);
+const parsedInput = parse(getInput(0));
+console.log(parsedInput);
+const part1Result = part1(parsedInput);
 Assert.isEqual(-1, part1Result);
 
 // // Part2
@@ -32,9 +32,9 @@ Assert.isEqual(-1, part1Result);
 //     return -1;
 // }
 //
-// console.log(parsedTestResult);
-// const part2Test = part2(parsedTestResult);
+// console.log(parsedTestInput);
+// const part2Test = part2(parsedTestInput);
 // Assert.isEqual(-1, part2Test);
 //
-// const part2Result = part2(parsedResult);
+// const part2Result = part2(parsedInput);
 // Assert.isEqual(-1, part2Result);

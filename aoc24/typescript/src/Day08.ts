@@ -1,5 +1,5 @@
 import { Assert } from "./Assert";
-import { addIfAbsent, getInput } from "./Util";
+import { addIfAbsent, getInput, timed, Util } from "./Util";
 import { Vec2 } from "./Vec2";
 import { Rect } from "./Rect";
 
@@ -110,11 +110,11 @@ class CityRoofs {
     }
 
     public part1() {
-        return this.antinodes().size;
+        return timed(() => this.antinodes().size, `part1 ${this.antennas.length}`);
     }
 
     public part2() {
-        return this.antinodes(true).size;
+        return timed(() => this.antinodes(true).size, `part2 ${this.antennas.length}`);
     }
 }
 
