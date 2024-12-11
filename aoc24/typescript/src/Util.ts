@@ -51,10 +51,33 @@ export function getInput(day: number) {
  * @param key
  * @param value
  */
-export function addIfAbsent(map: Map<string, object[]>, key: string, value: object) {
+export function addIfAbsent<K, V>(map: Map<K, V[]>, key: K, value: V) {
     map.set(key, [...(map.get(key) || []), value]);
+}
+
+export function computeIfAbsent<K, V>(map: Map<K, V>, key: K, producer: () => V) {
+    const existingValue = map.get(key);
+    if (existingValue)
+        return existingValue;
+
+    const value = producer();
+    map.set(key, value);
+    return value;
 }
 
 export function timed<T>(callback: () => T, label: string | undefined = undefined) {
     return Util.timed(callback, label);
+}
+
+export function partition<T>(array: T[], size: number): T[][] {
+    const output: T[][] = [];
+    for (var i = 0; i < array.length; i += size)
+    {
+        output[output.length] = array.slice(i, i + size);
+    }
+    return output;
+}
+
+export function partition2<T>(array: T[], size: number): T[][] {
+    return array.length ? [array.splice(0, size)].concat(partition(array, size)) : [];
 }
