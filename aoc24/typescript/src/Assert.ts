@@ -7,8 +7,8 @@ export class Assert {
         if (value == null) throw new Error(`Expected Name to be set ${name}`);
     }
 
-    public static isEqual(expected: number | object, actual: number | object, message = "") {
-        if (expected != actual) throw new Error(`Assertion failed! Expected: ${expected} to be equal to ${actual} ${message}`);
+    public static isEqual<T>(expected: T, actual: T, message = "") {
+        if (expected != actual) throw new Error(`Assertion failed! Expected: '${expected}' to be equal to '${actual}' ${message}`);
     }
 
     public static isIdentical(expected: number | object, actual: number | object) {

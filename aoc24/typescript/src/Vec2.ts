@@ -12,8 +12,7 @@ export class Vec2 {
 
     static of(x: number, y: number) {
         const key = `${x}|${y}`;
-        if (!this.cache.has(key))
-        {
+        if (!this.cache.has(key)) {
             this.cache.set(key, new Vec2(x, y))
         }
         return this.cache.get(key)!;
@@ -48,6 +47,18 @@ export class Vec2 {
     equals(other: Vec2) {
         return this === other ||
             this.x === other.x && this.y === other.y;
+    }
+
+    mod(rect: Vec2) {
+        let x = this.x % rect.x;
+        let y = this.y % rect.y;
+        if (x < 0) {
+            x += rect.x;
+        }
+        if (y < 0) {
+            y += rect.y;
+        }
+        return Vec2.of(x, y);
     }
 }
 

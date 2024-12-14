@@ -12,8 +12,11 @@ export class Rect {
         this.bottomRight = Vec2.of(x2, y2);
     }
 
-    public static of(topLeft: Vec2, bottomRight: Vec2) {
-        return new Rect(topLeft.x, bottomRight.x, topLeft.y, bottomRight.y);
+    public static of(topLeft: Vec2, bottomRight: Vec2 | undefined = undefined) {
+        if (bottomRight)
+            return new Rect(topLeft.x, bottomRight.x, topLeft.y, bottomRight.y);
+        bottomRight = topLeft; // passed only one argument, then its interpreted as bottomRight instead
+        return new Rect(0, bottomRight.x, 0, bottomRight.y);
     }
 
     public static from(x1: number, x2: number, y1: number, y2: number) {

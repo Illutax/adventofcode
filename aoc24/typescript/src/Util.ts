@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { appendFileSync, writeFileSync } from "node:fs";
 
 export class Util {
     public static getInput(day: number) {
@@ -6,6 +7,14 @@ export class Util {
         const content = readFileSync(`../input/day${dayString}.txt`, 'utf-8')
         console.log(`Read ${content.length} characters`);
         return content;
+    }
+
+    public static appendToFile(filePath: string, data: string) {
+        appendFileSync(filePath, data);
+    }
+
+    public static writeToFile(filePath: string, data: string) {
+        writeFileSync(filePath, data);
     }
 
     public static timed<T>(callback: () => T, label: string | undefined = undefined) {
@@ -63,6 +72,13 @@ export function computeIfAbsent<K, V>(map: Map<K, V>, key: K, producer: () => V)
     const value = producer();
     map.set(key, value);
     return value;
+}
+
+export function compute<K,V>(map: Map<K,V>, key: K, remappingFunction: (_: K, __: V) => V, fallBackValue: V|undefined = undefined) {
+    const oldValue = (map.get(key) || fallBackValue)!;
+    const newValue = remappingFunction(key, oldValue);
+    map.set(key,newValue);
+    return newValue;
 }
 
 export function timed<T>(callback: () => T, label: string | undefined = undefined) {
