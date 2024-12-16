@@ -4,10 +4,11 @@
   "scripts": {
     "watch": "npx tsc --watch",
     "build": "npx tsc",
-    "test": "npm run build && node --max-old-space-size=16384"
+    "test": "ts-node"
   },
   "devDependencies": {
     "typescript": "latest",
-    "@types/node": "latest"
+    "@types/node": "latest",
+    "ts-node": "latest"
   }
 }
